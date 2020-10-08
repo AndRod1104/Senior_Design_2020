@@ -12,12 +12,14 @@ class Controller(tk.Tk):
 
         self.geometry("400x600")
 
-        # not sure what this does
+        # region Design
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
+        #endregion
 
+        #region Frames
         # Dictionary of class names, frames (Ex: HomePage, actual frame)
         self.frames = {}
 
@@ -32,6 +34,7 @@ class Controller(tk.Tk):
 
         # Starting page
         self.show_frame(LoginPage)
+        #endregion
 
     # When called, passes the frame or page to be showed on windows
     def show_frame(self, cont):
@@ -44,6 +47,7 @@ class LoginPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
+        # region Design
         welcomeLabel = ttk.Label(self, text="Welcome to the BMI reading Platform", font=LARGE_FONT)
         welcomeLabel.pack(pady=10, padx=10)
 
@@ -63,11 +67,14 @@ class LoginPage(tk.Frame):
         button2 = ttk.Button(self, text="Login",
                             command=lambda: controller.show_frame(HomePage))
         button2.pack(pady=10, padx=10)
+        # endregion
 
 class HomePage(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
+
+        # region Design
         label = ttk.Label(self, text="Home Page", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
@@ -76,12 +83,13 @@ class HomePage(tk.Frame):
 
         button2 = ttk.Button(self, text="Start a patient Recording", command=lambda: controller.show_frame(RecordingPage))
         button2.pack()
-      
+        # endregion
 
 class RecordingPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
+        # region Design
         label = ttk.Label(self, text="Data recording page", font=LARGE_FONT)
         label.pack(pady=10, padx=10)
 
@@ -129,6 +137,8 @@ class RecordingPage(tk.Frame):
 
         button5 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(HomePage))
         button5.pack(pady=10, padx=10)
+
+        #endregion
 
         
 app = Controller()
