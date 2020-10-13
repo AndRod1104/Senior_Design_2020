@@ -2,7 +2,7 @@ import tkinter as tk
 from Design import *
 from tkinter import ttk, Entry
 import HelperMethods as hm
-
+from tkinter.messagebox import showerror
 
 class Controller(tk.Tk):
 
@@ -57,16 +57,15 @@ class LoginPage(tk.Frame):
         
         emailLabel = ttk.Label(self, text="Enter your email", font=SMALL_FONT)
         emailLabel.pack(pady=10, padx=10)
-        emailEntry = Entry(self)
+        emailEntry = ttk.Entry(self)
         emailEntry.pack()
 
         passwordLabel = ttk.Label(self, text="Please enter your password", font=SMALL_FONT)
         passwordLabel.pack(pady=10, padx=10)
-        passwordEntry = Entry(self)
+        passwordEntry = ttk.Entry(self)
         passwordEntry.pack()
 
-        button2 = ttk.Button(self, text="Login",
-                            command=lambda: controller.show_frame(HomePage))
+        button2 = ttk.Button(self, text="Login", command=lambda: controller.show_frame(HomePage))
         button2.pack(pady=10, padx=10)
         # endregion
 
@@ -86,83 +85,91 @@ class HomePage(tk.Frame):
         button2.pack()
         # endregion
 
-class RecordingPage(tk.Frame):
 
+class RecordingPage(tk.Frame):
     # values for all labels
     ageValue = 0
     weightValue = 0
     heightValue = 0
-    nameValue = ""
+    idValue = ""
     skinColorValue = ""
     raceOptionSelected = ""
     ethnicityOptionSelected = ""
+    genderOptionSelected = ""
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
         # region Design
         label = ttk.Label(self, text="Data recording page", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
+        label.grid(row=0, column=1)
 
-        nameLabel = ttk.Label(self, text="Patient Name", font=SMALL_FONT)
-        nameLabel.pack()
-        nameEntry = Entry(self)
-        nameEntry.pack()
+        nameLabel = ttk.Label(self, text="Patient ID", font=SMALL_FONT)
+        nameLabel.grid(row=2, column=0, padx=0, pady=10)
+        nameEntry = ttk.Entry(self)
+        nameEntry.grid(row=2, column=1)
 
         ageLabel = ttk.Label(self, text="Age", font=SMALL_FONT)
-        ageLabel.pack()
-        ageEntry = Entry(self)
-        ageEntry.pack()
+        ageLabel.grid(row=4, column=0, padx=10, pady=10)
+        ageEntry = ttk.Entry(self)
+        ageEntry.grid(row=4, column=1)
+
+        genderLabel = ttk.Label(self, text="Biological Gender", font=SMALL_FONT)
+        genderLabel.grid(row=6, column=0, padx=10, pady=10)
+        self.genderOptionSelected = tk.StringVar()
+        self.genderOptionSelected.set(hm.Gender[0])  # Initial value
+        genderOptions = ttk.OptionMenu(self, self.genderOptionSelected, *hm.Gender)
+        genderOptions.grid(row=6, column=1)
 
         weightLabel = ttk.Label(self, text="Weight", font=SMALL_FONT)
-        weightLabel.pack()
-        weightEntry = Entry(self)
-        weightEntry.pack()
+        weightLabel.grid(row=8, column=0, padx=10, pady=10)
+        weightEntry = ttk.Entry(self)
+        weightEntry.grid(row=8, column=1)
 
         heightLabel = ttk.Label(self, text="Height", font=SMALL_FONT)
-        heightLabel.pack()
-        heightEntry = Entry(self)
-        heightEntry.pack()
+        heightLabel.grid(row=10, column=0, padx=10, pady=10)
+        heightEntry = ttk.Entry(self)
+        heightEntry.grid(row=10, column=1)
 
         ethnicityLabel = ttk.Label(self, text="Ethnicity", font=SMALL_FONT)
-        ethnicityLabel.pack()
+        ethnicityLabel.grid(row=12, column=0, padx=10, pady=10)
         self.ethnicityOptionSelected = tk.StringVar()
         self.ethnicityOptionSelected.set(hm.Ethnicity[0])   # Initial value
-        ethnicityOptions = tk.OptionMenu(self, self.ethnicityOptionSelected, *hm.Ethnicity)
-        ethnicityOptions.pack()
+        ethnicityOptions = ttk.OptionMenu(self, self.ethnicityOptionSelected, *hm.Ethnicity)
+        ethnicityOptions.grid(row=12, column=1)
 
 
         raceLabel = ttk.Label(self, text="Race", font=SMALL_FONT)
-        raceLabel.pack()
+        raceLabel.grid(row=14, column=0, padx=10, pady=10)
         self.raceOptionSelected = tk.StringVar()
         self.raceOptionSelected.set(hm.Race[0])             # Initial value
-        raceOptions = tk.OptionMenu(self, self.raceOptionSelected, *hm.Race)
-        raceOptions.pack()
+        raceOptions = ttk.OptionMenu(self, self.raceOptionSelected, *hm.Race)
+        raceOptions.grid(row=14, column=1)
 
         skinColorLabel = ttk.Label(self, text="Skin Color", font=SMALL_FONT)
-        skinColorLabel.pack()
-        skinColorEntry = Entry(self)
-        skinColorEntry.pack()
+        skinColorLabel.grid(row=16, column=0, padx=10, pady=10)
+        skinColorEntry = ttk.Entry(self)
+        skinColorEntry.grid(row=16, column=1)
 
         button1 = ttk.Button(self, text="Start recording", command=lambda: start_process())
-        button1.pack(pady=10, padx=10)
+        button1.grid(row=18, column=0, padx=10, pady=10)
 
         button2 = ttk.Button(self, text="Pause recording")
-        button2.pack()
+        button2.grid(row=18, column=1, padx=10, pady=10)
 
         button3 = ttk.Button(self, text="Stop recording")
-        button3.pack(pady=10, padx=10)
+        button3.grid(row=20, column=0, padx=10, pady=10)
 
         button4 = ttk.Button(self, text="Store recording")
-        button4.pack()
+        button4.grid(row=20, column=1, padx=10, pady=10)
 
         button5 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(HomePage))
-        button5.pack(pady=10, padx=10)
+        button5.grid(row=22, column=1, padx=10, pady=10)
         # endregion
 
         # verify all fields first, then connect to db and send all info
         def start_process():
-            # getValues stores all values from fields into variables and returns any errors found while trying to
+            # getValues stores all values from fields into variables and returns any errors found when trying to
             # convert each field into its respective type
             error = getValues()
 
@@ -172,13 +179,14 @@ class RecordingPage(tk.Frame):
                 print(self.heightValue)
                 print(self.weightValue)
                 print(self.ethnicityOptionSelected.get())
+                print(self.genderOptionSelected.get())
                 print(self.raceOptionSelected.get())
                 print(self.skinColorValue)
 
                 return
             else:
                 # display pop-up dialog box with error message
-                print(error)
+                showerror("Errors", "Please fix the following errors:\n" + error)
                 return
 
         def getValues():
@@ -204,11 +212,14 @@ class RecordingPage(tk.Frame):
             if hm.isEmpty(self.skinColorValue):
                 ErrorMessage += "No entry for skin color.\n"
 
-            self.nameValue = nameEntry.get()
-            if hm.isEmpty(self.nameValue):
+            self.idValue = nameEntry.get()
+            if hm.isEmpty(self.idValue):
                 ErrorMessage += "No entry for name.\n"
 
             if hm.isScrollDownMenuWrong(self.ethnicityOptionSelected.get()):
+                ErrorMessage += "Please select an option for ethnicity.\n"
+
+            if hm.isScrollDownMenuWrong(self.genderOptionSelected.get()):
                 ErrorMessage += "Please select an option for ethnicity.\n"
 
             if hm.isScrollDownMenuWrong(self.raceOptionSelected.get()):

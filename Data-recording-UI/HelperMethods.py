@@ -26,6 +26,10 @@ Race = ["Select an option",
         "European",
         "Native American",
         "Oceanic"]
+
+Gender = ["Select an option",
+          "Female",
+          "Male"]
 #endregion
 
 def isAgeValid(age):
