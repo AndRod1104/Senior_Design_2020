@@ -4,6 +4,7 @@ from tkinter import ttk, Entry
 import HelperMethods as hm
 from tkinter.messagebox import showerror
 
+
 class Controller(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -69,6 +70,7 @@ class LoginPage(tk.Frame):
         button2.pack(pady=10, padx=10)
         # endregion
 
+
 class HomePage(tk.Frame):
 
     def __init__(self, parent, controller):
@@ -96,6 +98,7 @@ class RecordingPage(tk.Frame):
     raceOptionSelected = ""
     ethnicityOptionSelected = ""
     genderOptionSelected = ""
+    bodyPartValue = ""
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -104,34 +107,34 @@ class RecordingPage(tk.Frame):
         label = ttk.Label(self, text="Data recording page", font=LARGE_FONT)
         label.grid(row=0, column=1)
 
-        nameLabel = ttk.Label(self, text="Patient ID", font=SMALL_FONT)
-        nameLabel.grid(row=2, column=0, padx=0, pady=10)
-        nameEntry = ttk.Entry(self)
-        nameEntry.grid(row=2, column=1)
+        idLabel = ttk.Label(self, text="Patient ID:", font=SMALL_FONT)
+        idLabel.grid(row=2, column=0, padx=0, pady=10)
+        idEntry = ttk.Entry(self)
+        idEntry.grid(row=2, column=1)
 
-        ageLabel = ttk.Label(self, text="Age", font=SMALL_FONT)
+        ageLabel = ttk.Label(self, text="Age:", font=SMALL_FONT)
         ageLabel.grid(row=4, column=0, padx=10, pady=10)
         ageEntry = ttk.Entry(self)
         ageEntry.grid(row=4, column=1)
 
-        genderLabel = ttk.Label(self, text="Biological Gender", font=SMALL_FONT)
+        genderLabel = ttk.Label(self, text="Biological Gender:", font=SMALL_FONT)
         genderLabel.grid(row=6, column=0, padx=10, pady=10)
         self.genderOptionSelected = tk.StringVar()
         self.genderOptionSelected.set(hm.Gender[0])  # Initial value
         genderOptions = ttk.OptionMenu(self, self.genderOptionSelected, *hm.Gender)
         genderOptions.grid(row=6, column=1)
 
-        weightLabel = ttk.Label(self, text="Weight", font=SMALL_FONT)
+        weightLabel = ttk.Label(self, text="Weight:", font=SMALL_FONT)
         weightLabel.grid(row=8, column=0, padx=10, pady=10)
         weightEntry = ttk.Entry(self)
         weightEntry.grid(row=8, column=1)
 
-        heightLabel = ttk.Label(self, text="Height", font=SMALL_FONT)
+        heightLabel = ttk.Label(self, text="Height:", font=SMALL_FONT)
         heightLabel.grid(row=10, column=0, padx=10, pady=10)
         heightEntry = ttk.Entry(self)
         heightEntry.grid(row=10, column=1)
 
-        ethnicityLabel = ttk.Label(self, text="Ethnicity", font=SMALL_FONT)
+        ethnicityLabel = ttk.Label(self, text="Ethnicity:", font=SMALL_FONT)
         ethnicityLabel.grid(row=12, column=0, padx=10, pady=10)
         self.ethnicityOptionSelected = tk.StringVar()
         self.ethnicityOptionSelected.set(hm.Ethnicity[0])   # Initial value
@@ -139,33 +142,44 @@ class RecordingPage(tk.Frame):
         ethnicityOptions.grid(row=12, column=1)
 
 
-        raceLabel = ttk.Label(self, text="Race", font=SMALL_FONT)
+        raceLabel = ttk.Label(self, text="Race:", font=SMALL_FONT)
         raceLabel.grid(row=14, column=0, padx=10, pady=10)
         self.raceOptionSelected = tk.StringVar()
         self.raceOptionSelected.set(hm.Race[0])             # Initial value
         raceOptions = ttk.OptionMenu(self, self.raceOptionSelected, *hm.Race)
         raceOptions.grid(row=14, column=1)
 
-        skinColorLabel = ttk.Label(self, text="Skin Color", font=SMALL_FONT)
+        skinColorLabel = ttk.Label(self, text="Skin Color:", font=SMALL_FONT)
         skinColorLabel.grid(row=16, column=0, padx=10, pady=10)
         skinColorEntry = ttk.Entry(self)
         skinColorEntry.grid(row=16, column=1)
 
-        button1 = ttk.Button(self, text="Start recording", command=lambda: start_process())
-        button1.grid(row=18, column=0, padx=10, pady=10)
+        bodyPartLabel = ttk.Label(self, text="Body part:", font=SMALL_FONT)
+        bodyPartLabel.grid(row=18, column=0, padx=10, pady=10)
+        bodyPartEntry = ttk.Entry(self)
+        bodyPartEntry.grid(row=18, column=1)
 
-        button2 = ttk.Button(self, text="Pause recording")
-        button2.grid(row=18, column=1, padx=10, pady=10)
+        btnStart = ttk.Button(self, text="Start recording", command=lambda: start_process())
+        btnStart.grid(row=20, column=0, padx=10, pady=10)
 
-        button3 = ttk.Button(self, text="Stop recording")
-        button3.grid(row=20, column=0, padx=10, pady=10)
+        btnStop = ttk.Button(self, text="Stop recording", command=lambda: stop_process())
+        btnStop.grid(row=20, column=1, padx=10, pady=10)
 
-        button4 = ttk.Button(self, text="Store recording")
-        button4.grid(row=20, column=1, padx=10, pady=10)
+        btnPause = ttk.Button(self, text="Pause recording", command=lambda: pause_process())
+        btnPause.grid(row=22, column=0, padx=10, pady=10)
 
-        button5 = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(HomePage))
-        button5.grid(row=22, column=1, padx=10, pady=10)
+        btnResume = ttk.Button(self, text="Resume recording", command=lambda: resume_process())
+        btnResume.grid(row=22, column=1, padx=10, pady=10)
+
+        btnStore = ttk.Button(self, text="Store recording")
+        btnStore.grid(row=24, column=0, padx=10, pady=10)
+
+        btnBackHome = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(HomePage))
+        btnBackHome.grid(row=24, column=1, padx=10, pady=10)
         # endregion
+
+        # At first only btnStart and back to home, will be enable
+        hm.disable_fields(btnStore, btnResume, btnPause, btnStop)
 
         # verify all fields first, then connect to db and send all info
         def start_process():
@@ -183,11 +197,48 @@ class RecordingPage(tk.Frame):
                 print(self.raceOptionSelected.get())
                 print(self.skinColorValue)
 
+                hm.enable_fields(btnPause, btnStop)
+
+                hm.disable_fields(btnStart, btnBackHome, btnStore, idEntry, genderOptions, ageEntry, weightEntry,
+                                  heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartEntry, btnResume)
+
                 return
             else:
                 # display pop-up dialog box with error message
                 showerror("Errors", "Please fix the following errors:\n" + error)
                 return
+
+        # stops the recording session, enables back all buttons and saves the data. Disconnect from db
+        def stop_process():
+            hm.enable_fields(btnStart, btnBackHome, btnStore, idEntry, genderOptions, ageEntry, weightEntry,
+                             heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartEntry)
+
+            hm.disable_fields(btnResume, btnPause, btnStop)
+
+            return
+
+        # Used to pause session, enabling the option to switch the sensor to another body part. Keeps the connection
+        # open and saves data as a different record since patient ID and body location are both primary key
+        def pause_process():
+
+            hm.disable_fields(btnPause)
+            hm.enable_fields(bodyPartEntry, btnResume)
+
+            return
+
+        # Resumes process. Lets you re-input body part. Sends new body part + ID to database
+        def resume_process():
+
+            # check if everything is correct and if you changed body part it gets the new value and checks it as well
+            error = getValues()
+
+            if len(error) == 0:
+                hm.enable_fields(btnPause)
+                hm.disable_fields(btnResume, bodyPartEntry)
+            else:
+                showerror("Errors", "Please fix the following errors:\n" + error)
+
+            return
 
         def getValues():
 
@@ -212,9 +263,13 @@ class RecordingPage(tk.Frame):
             if hm.isEmpty(self.skinColorValue):
                 ErrorMessage += "No entry for skin color.\n"
 
-            self.idValue = nameEntry.get()
+            self.idValue = idEntry.get()
             if hm.isEmpty(self.idValue):
-                ErrorMessage += "No entry for name.\n"
+                ErrorMessage += "No entry for ID.\n"
+
+            self.bodyPartValue = bodyPartEntry.get()
+            if hm.isEmpty(self.bodyPartValue):
+                ErrorMessage += "No entry for body part\n"
 
             if hm.isScrollDownMenuWrong(self.ethnicityOptionSelected.get()):
                 ErrorMessage += "Please select an option for ethnicity.\n"

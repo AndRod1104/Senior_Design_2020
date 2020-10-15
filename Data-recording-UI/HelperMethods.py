@@ -51,3 +51,13 @@ def isEmpty(field):
 
 def isHeightValid(height):
     return MIN_HEIGHT < height < MAX_HEIGHT
+
+
+def disable_fields(*fields):
+    for field in fields:
+        field["state"] = "disabled"
+
+
+def enable_fields(*fields):
+    for field in fields:
+        field["state"] = "normal"
