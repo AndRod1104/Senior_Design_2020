@@ -98,14 +98,14 @@ class RecordingPage(tk.Frame):
     raceOptionSelected = ""
     ethnicityOptionSelected = ""
     genderOptionSelected = ""
-    bodyPartValue = ""
+    bodyPartOptionSelected = ""
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
         # region Design
-        label = ttk.Label(self, text="Data recording page", font=LARGE_FONT)
-        label.grid(row=0, column=1)
+        label = ttk.Label(self, text="Data recording", font=LARGE_FONT)
+        label.grid(row=0, column=1, padx=0, pady=10)
 
         idLabel = ttk.Label(self, text="Patient ID:", font=SMALL_FONT)
         idLabel.grid(row=2, column=0, padx=0, pady=10)
@@ -156,8 +156,10 @@ class RecordingPage(tk.Frame):
 
         bodyPartLabel = ttk.Label(self, text="Body part:", font=SMALL_FONT)
         bodyPartLabel.grid(row=18, column=0, padx=10, pady=10)
-        bodyPartEntry = ttk.Entry(self)
-        bodyPartEntry.grid(row=18, column=1)
+        self.bodyPartOptionSelected = tk.StringVar()
+        self.bodyPartOptionSelected.set(hm.BodyParts[0])    # Initial Value
+        bodyPartOptions = ttk.OptionMenu(self, self.bodyPartOptionSelected, *hm.BodyParts)
+        bodyPartOptions.grid(row=18, column=1, padx=10, pady=10)
 
         btnStart = ttk.Button(self, text="Start recording", command=lambda: start_process())
         btnStart.grid(row=20, column=0, padx=10, pady=10)
@@ -200,7 +202,7 @@ class RecordingPage(tk.Frame):
                 hm.enable_fields(btnPause, btnStop)
 
                 hm.disable_fields(btnStart, btnBackHome, btnStore, idEntry, genderOptions, ageEntry, weightEntry,
-                                  heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartEntry, btnResume)
+                                  heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartOptions, btnResume)
 
                 return
             else:
@@ -211,7 +213,7 @@ class RecordingPage(tk.Frame):
         # stops the recording session, enables back all buttons and saves the data. Disconnect from db
         def stop_process():
             hm.enable_fields(btnStart, btnBackHome, btnStore, idEntry, genderOptions, ageEntry, weightEntry,
-                             heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartEntry)
+                             heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartOptions)
 
             hm.disable_fields(btnResume, btnPause, btnStop)
 
@@ -222,7 +224,7 @@ class RecordingPage(tk.Frame):
         def pause_process():
 
             hm.disable_fields(btnPause)
-            hm.enable_fields(bodyPartEntry, btnResume)
+            hm.enable_fields(bodyPartOptions, btnResume)
 
             return
 
@@ -234,7 +236,7 @@ class RecordingPage(tk.Frame):
 
             if len(error) == 0:
                 hm.enable_fields(btnPause)
-                hm.disable_fields(btnResume, bodyPartEntry)
+                hm.disable_fields(btnResume, bodyPartOptions)
             else:
                 showerror("Errors", "Please fix the following errors:\n" + error)
 
@@ -267,9 +269,9 @@ class RecordingPage(tk.Frame):
             if hm.isEmpty(self.idValue):
                 ErrorMessage += "No entry for ID.\n"
 
-            self.bodyPartValue = bodyPartEntry.get()
-            if hm.isEmpty(self.bodyPartValue):
-                ErrorMessage += "No entry for body part\n"
+
+            if hm.isScrollDownMenuWrong(self.bodyPartOptionSelected.get()):
+                ErrorMessage += "Please select an option for body part.\n"
 
             if hm.isScrollDownMenuWrong(self.ethnicityOptionSelected.get()):
                 ErrorMessage += "Please select an option for ethnicity.\n"

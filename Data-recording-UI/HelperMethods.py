@@ -1,4 +1,4 @@
-#region Min-Max values
+# region Min-Max values
 MIN_AGE = 18
 MAX_AGE = 100
 
@@ -30,7 +30,13 @@ Race = ["Select an option",
 Gender = ["Select an option",
           "Female",
           "Male"]
-#endregion
+
+BodyParts = ["Select an option",
+             "Head",
+             "Arm",
+             "Leg",
+             "Chest"]
+# endregion
 
 def isAgeValid(age):
     return MIN_AGE < age < MAX_AGE
