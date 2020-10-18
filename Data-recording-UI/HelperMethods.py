@@ -40,6 +40,8 @@ BodyParts = ["Select an option",
              "Arm",
              "Leg",
              "Chest"]
+
+
 # endregion
 
 def isAgeValid(age):
