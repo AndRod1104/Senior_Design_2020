@@ -1,5 +1,5 @@
 import tkinter as tk
-import time
+from datetime import datetime
 from Design import *
 from tkinter import ttk, Entry
 import HelperMethods as hm
@@ -103,6 +103,11 @@ class RecordingPage(tk.Frame):
     bodyPartOptionSelected = ""
     durationValue = 0
 
+    # stopwatch
+    running = False
+    counter = 0
+    timer = ""
+
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
@@ -187,7 +192,6 @@ class RecordingPage(tk.Frame):
         btnBackHome = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(HomePage))
         btnBackHome.grid(row=26, column=1, padx=10, pady=10)
 
-        progressBar = ttk.Progressbar(self, orient="horizontal", length=150, mode="determinate")
         # endregion
 
         # At first only btnStart and back to home, will be enable
@@ -198,6 +202,8 @@ class RecordingPage(tk.Frame):
             # getValues stores all values from fields into variables and returns any errors found when trying to
             # convert each field into its respective type
             error = getValues()
+
+
 
             if len(error) == 0:     # no errors
                 # set up connection and send values
@@ -215,8 +221,10 @@ class RecordingPage(tk.Frame):
                                   heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartOptions,
                                   btnResume, durationEntry)
 
-                progressBar.grid(row=28, padx=10, pady=10)
-                threading.Thread(target=startProgressBar()).start()
+                self.timer = tk.Label(self, text="Welcome!", fg="black", font="Verdana 20 bold")
+                self.timer.grid(row=28, column=0, padx=10, pady=10)
+
+                Start(self.timer)
 
                 return
             else:
@@ -230,6 +238,9 @@ class RecordingPage(tk.Frame):
                              heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartOptions, durationEntry)
 
             hm.disable_fields(btnResume, btnPause, btnStop)
+
+            self.running = False
+            self.timer.destroy()
 
             return
 
@@ -288,17 +299,17 @@ class RecordingPage(tk.Frame):
             if hm.isEmpty(self.idValue):
                 ErrorMessage += "No entry for ID.\n"
 
-            if hm.isScrollDownMenuWrong(self.bodyPartOptionSelected.get()):
-                ErrorMessage += "Please select an option for body part.\n"
+            ErrorMessage += checkScrollDownLables(self.bodyPartOptionSelected.get(), "body part",
+                                                  self.ethnicityOptionSelected.get(), "ethnicity",
+                                                  self.genderOptionSelected.get(), "gender",
+                                                  self.raceOptionSelected.get(), "race")
 
-            if hm.isScrollDownMenuWrong(self.ethnicityOptionSelected.get()):
-                ErrorMessage += "Please select an option for ethnicity.\n"
+            ErrorMessage += check_strings_not_empty()
 
-            if hm.isScrollDownMenuWrong(self.genderOptionSelected.get()):
-                ErrorMessage += "Please select an option for ethnicity.\n"
+            return ErrorMessage
 
-            if hm.isScrollDownMenuWrong(self.raceOptionSelected.get()):
-                ErrorMessage += "Please select an option for race.\n"
+        def check_strings_not_empty():
+            ErrorMessage = ""
 
             if not hm.isAgeValid(self.ageValue):
                 ErrorMessage += "Value of age is invalid.\n"
@@ -314,13 +325,41 @@ class RecordingPage(tk.Frame):
 
             return ErrorMessage
 
-        def startProgressBar():
-            for x in range(self.durationValue):
-                progressBar["value"] += 20
-                self.update_idletasks()
-                time.sleep(1)
+        def checkScrollDownLables(*arguments):
+            errorMsg = ""
 
-            return
+            count = 0
+            for argument in arguments:
+                if count % 2 == 0:
+                    if(hm.isScrollDownMenuWrong(argument)):
+                        errorMsg += "Please select an option for " + arguments[count + 1] + ".\n"
+                count += 1
+
+            return errorMsg
+
+        def Start(current_lable2):
+            self.running = True
+            self.counter = 18000
+            counter_label(current_lable2)
+
+        def counter_label(current_label):
+            def count():
+                if self.running:
+
+                    # To manage the intial delay.
+                    if self.counter == 18000:
+                        display = "Starting..."
+                    else:
+                        tt = datetime.fromtimestamp(self.counter)
+                        string = tt.strftime("%H:%M:%S")
+                        display = string
+
+                    current_label['text'] = display  # Or label.config(text=display)
+
+                    current_label.after(1000, count)
+                    self.counter += 1
+            # Triggering the start of the counter.
+            count()
 
 
 app = Controller()
