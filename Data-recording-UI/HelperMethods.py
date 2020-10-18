@@ -32,8 +32,8 @@ Race = ["Select an option",
         "Oceanic"]
 
 Gender = ["Select an option",
-          "Female",
-          "Male"]
+          "F",
+          "M"]
 
 BodyParts = ["Select an option",
              "Head",
