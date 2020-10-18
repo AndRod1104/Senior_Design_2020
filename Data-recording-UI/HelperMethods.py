@@ -41,7 +41,13 @@ BodyParts = ["Select an option",
              "Leg",
              "Chest"]
 
-
+SkinColor = ["Select an option",
+             "Type I",
+             "Type II",
+             "Type III",
+             "Type VI",
+             "Type V",
+             "Type VI"]
 # endregion
 
 def isAgeValid(age):
