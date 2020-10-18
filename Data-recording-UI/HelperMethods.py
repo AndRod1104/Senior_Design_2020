@@ -10,6 +10,10 @@ MAX_WEIGHT = 500
 MIN_HEIGHT = 1.00
 MAX_HEIGHT = 8.00
 
+# Duration is in seconds
+MIN_DURATION = 1
+MAX_DURATION = 120  # 2 min
+
 DEFAULT_SCROLLDOWNMENU_OPTION = "Select an option"
 
 Ethnicity = ["Select an option",
@@ -67,3 +71,6 @@ def disable_fields(*fields):
 def enable_fields(*fields):
     for field in fields:
         field["state"] = "normal"
+
+def isDurationValid(duration):
+    return MIN_DURATION < duration < MAX_DURATION

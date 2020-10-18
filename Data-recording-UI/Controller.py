@@ -1,8 +1,10 @@
 import tkinter as tk
+import time
 from Design import *
 from tkinter import ttk, Entry
 import HelperMethods as hm
 from tkinter.messagebox import showerror
+import threading
 
 
 class Controller(tk.Tk):
@@ -12,7 +14,7 @@ class Controller(tk.Tk):
 
         tk.Tk.wm_title(self, "Data Recording")
 
-        self.geometry("400x600")
+        self.geometry("400x650")
 
         # region Design
         container = tk.Frame(self)
@@ -99,6 +101,7 @@ class RecordingPage(tk.Frame):
     ethnicityOptionSelected = ""
     genderOptionSelected = ""
     bodyPartOptionSelected = ""
+    durationValue = 0
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -161,23 +164,30 @@ class RecordingPage(tk.Frame):
         bodyPartOptions = ttk.OptionMenu(self, self.bodyPartOptionSelected, *hm.BodyParts)
         bodyPartOptions.grid(row=18, column=1, padx=10, pady=10)
 
+        durationLabel = ttk.Label(self, text="Duration:", font=SMALL_FONT)
+        durationLabel.grid(row=20, column=0, padx=10, pady=10)
+        durationEntry = ttk.Entry(self)
+        durationEntry.grid(row=20, column=1)
+
         btnStart = ttk.Button(self, text="Start recording", command=lambda: start_process())
-        btnStart.grid(row=20, column=0, padx=10, pady=10)
+        btnStart.grid(row=22, column=0, padx=10, pady=10)
 
         btnStop = ttk.Button(self, text="Stop recording", command=lambda: stop_process())
-        btnStop.grid(row=20, column=1, padx=10, pady=10)
+        btnStop.grid(row=22, column=1, padx=10, pady=10)
 
         btnPause = ttk.Button(self, text="Pause recording", command=lambda: pause_process())
-        btnPause.grid(row=22, column=0, padx=10, pady=10)
+        btnPause.grid(row=24, column=0, padx=10, pady=10)
 
         btnResume = ttk.Button(self, text="Resume recording", command=lambda: resume_process())
-        btnResume.grid(row=22, column=1, padx=10, pady=10)
+        btnResume.grid(row=24, column=1, padx=10, pady=10)
 
         btnStore = ttk.Button(self, text="Store recording")
-        btnStore.grid(row=24, column=0, padx=10, pady=10)
+        btnStore.grid(row=26, column=0, padx=10, pady=10)
 
         btnBackHome = ttk.Button(self, text="Back to Home", command=lambda: controller.show_frame(HomePage))
-        btnBackHome.grid(row=24, column=1, padx=10, pady=10)
+        btnBackHome.grid(row=26, column=1, padx=10, pady=10)
+
+        progressBar = ttk.Progressbar(self, orient="horizontal", length=150, mode="determinate")
         # endregion
 
         # At first only btnStart and back to home, will be enable
@@ -202,7 +212,11 @@ class RecordingPage(tk.Frame):
                 hm.enable_fields(btnPause, btnStop)
 
                 hm.disable_fields(btnStart, btnBackHome, btnStore, idEntry, genderOptions, ageEntry, weightEntry,
-                                  heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartOptions, btnResume)
+                                  heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartOptions,
+                                  btnResume, durationEntry)
+
+                progressBar.grid(row=28, padx=10, pady=10)
+                threading.Thread(target=startProgressBar()).start()
 
                 return
             else:
@@ -213,7 +227,7 @@ class RecordingPage(tk.Frame):
         # stops the recording session, enables back all buttons and saves the data. Disconnect from db
         def stop_process():
             hm.enable_fields(btnStart, btnBackHome, btnStore, idEntry, genderOptions, ageEntry, weightEntry,
-                             heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartOptions)
+                             heightEntry, ethnicityOptions, raceOptions, skinColorEntry, bodyPartOptions, durationEntry)
 
             hm.disable_fields(btnResume, btnPause, btnStop)
 
@@ -224,7 +238,7 @@ class RecordingPage(tk.Frame):
         def pause_process():
 
             hm.disable_fields(btnPause)
-            hm.enable_fields(bodyPartOptions, btnResume)
+            hm.enable_fields(bodyPartOptions, btnResume, durationEntry)
 
             return
 
@@ -236,7 +250,7 @@ class RecordingPage(tk.Frame):
 
             if len(error) == 0:
                 hm.enable_fields(btnPause)
-                hm.disable_fields(btnResume, bodyPartOptions)
+                hm.disable_fields(btnResume, bodyPartOptions, durationEntry)
             else:
                 showerror("Errors", "Please fix the following errors:\n" + error)
 
@@ -261,6 +275,11 @@ class RecordingPage(tk.Frame):
             except ValueError:
                 ErrorMessage += "Value entered for weight is not a number.\n"
 
+            try:
+                self.durationValue = int(durationEntry.get())
+            except ValueError:
+                ErrorMessage += "Value entered for duration is not a number.\n"
+
             self.skinColorValue = skinColorEntry.get()
             if hm.isEmpty(self.skinColorValue):
                 ErrorMessage += "No entry for skin color.\n"
@@ -268,7 +287,6 @@ class RecordingPage(tk.Frame):
             self.idValue = idEntry.get()
             if hm.isEmpty(self.idValue):
                 ErrorMessage += "No entry for ID.\n"
-
 
             if hm.isScrollDownMenuWrong(self.bodyPartOptionSelected.get()):
                 ErrorMessage += "Please select an option for body part.\n"
@@ -291,7 +309,18 @@ class RecordingPage(tk.Frame):
             if not hm.isHeightValid(self.heightValue):
                 ErrorMessage += "Value of height is invalid.\n"
 
+            if not hm.isDurationValid(self.durationValue):
+                ErrorMessage += "Value of duration is invalid.\n"
+
             return ErrorMessage
+
+        def startProgressBar():
+            for x in range(self.durationValue):
+                progressBar["value"] += 20
+                self.update_idletasks()
+                time.sleep(1)
+
+            return
 
 
 app = Controller()
