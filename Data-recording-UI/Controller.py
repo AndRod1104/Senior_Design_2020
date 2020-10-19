@@ -203,9 +203,9 @@ class LogPatient(tk.Frame):
         # endregion
 
         def save_and_goToRecordingPage():
-            # getValues stores all values from fields into variables and returns any errors found when trying to
+            # get_values stores all values from fields into variables and returns any errors found when trying to
             # convert each field into its respective type
-            error = getValues()
+            error = get_values()
 
             if len(error) == 0:  # no errors
                 # set up connection and send values
@@ -224,59 +224,59 @@ class LogPatient(tk.Frame):
                 showerror("Errors", "Please fix the following errors:\n" + error)
                 return
 
-        def getValues():
+        def get_values():
 
-            ErrorMessage = ""
+            error_message = ""
 
             try:
                 self.ageValue = int(ageEntry.get())
             except ValueError:
-                ErrorMessage += "Value entered for age is not a number.\n"
+                error_message += "Value entered for age is not a number.\n"
 
             try:
                 self.heightValue = float(heightEntry.get())
             except ValueError:
-                ErrorMessage += "Value entered for height is not a number.\n"
+                error_message += "Value entered for height is not a number.\n"
 
             try:
                 self.weightValue = int(weightEntry.get())
             except ValueError:
-                ErrorMessage += "Value entered for weight is not a number.\n"
+                error_message += "Value entered for weight is not a number.\n"
 
-            ErrorMessage += checkScrollDownLables(self.ethnicityOptionSelected.get(), "ethnicity",
-                                                  self.genderOptionSelected.get(), "gender",
-                                                  self.raceOptionSelected.get(), "race",
-                                                  self.skinColorType.get(), "skin color")
+            error_message += check_scroll_down_labels(self.ethnicityOptionSelected.get(), "ethnicity",
+                                                   self.genderOptionSelected.get(), "gender",
+                                                   self.raceOptionSelected.get(), "race",
+                                                   self.skinColorType.get(), "skin color")
 
-            ErrorMessage += check_strings_not_empty()
+            error_message += check_fields_not_empty()
 
-            return ErrorMessage
+            return error_message
 
-        def check_strings_not_empty():
-            ErrorMessage = ""
+        def check_fields_not_empty():
+            error_message = ""
 
             if not hm.isAgeValid(self.ageValue):
-                ErrorMessage += "Value of age is invalid.\n"
+                error_message += "Value of age is invalid.\n"
 
             if not hm.isWeightValid(self.weightValue):
-                ErrorMessage += "Value of weight is invalid.\n"
+                error_message += "Value of weight is invalid.\n"
 
             if not hm.isHeightValid(self.heightValue):
-                ErrorMessage += "Value of height is invalid.\n"
+                error_message += "Value of height is invalid.\n"
 
-            return ErrorMessage
+            return error_message
 
-        def checkScrollDownLables(*arguments):
-            errorMsg = ""
+        def check_scroll_down_labels(*arguments):
+            error_msg = ""
 
             count = 0
             for argument in arguments:
                 if count % 2 == 0:
                     if (hm.isScrollDownMenuWrong(argument)):
-                        errorMsg += "Please select an option for " + arguments[count + 1] + ".\n"
+                        error_msg += "Please select an option for " + arguments[count + 1] + ".\n"
                 count += 1
 
-            return errorMsg
+            return error_msg
 
 
 class DataRecording(tk.Frame):
@@ -325,23 +325,33 @@ class DataRecording(tk.Frame):
 
             if len(errors) == 0:    # no errors
 
-                if btnStart_Stop["text"] == "Start":
-                    btnStart_Stop["text"] = "Stop"
-
-                    self.timer = tk.Label(self, text="Welcome!", fg="black", font="Verdana 15 bold")
-                    self.timer.grid(row=10, column=1, padx=10, pady=10)
-
-                    Start(self.timer)
+                if is_start_button(btnStart_Stop):
+                    start_event_handler()
                 else:
-                    if btnStart_Stop["text"] == "Stop":
-                        btnStart_Stop["text"] = "Start"
-
-                        self.running = False
-                        self.timer.destroy()
+                    stop_event_handler()
 
             else:
                 showerror("Errors", "Please fix the following errors:\n" + errors)
 
+            return
+
+        def is_start_button(button):
+            return button["text"] == "Start"
+
+        def start_event_handler():
+            btnStart_Stop["text"] = "Stop"
+
+            self.timer = tk.Label(self, text="Welcome!", fg="black", font="Verdana 15 bold")
+            self.timer.grid(row=10, column=1, padx=10, pady=10)
+
+            start_stopwatch(self.timer)
+            return
+
+        def stop_event_handler():
+            btnStart_Stop["text"] = "Start"
+
+            self.running = False
+            self.timer.destroy()
             return
 
         def check_fields():
@@ -353,7 +363,7 @@ class DataRecording(tk.Frame):
 
             return error_message
 
-        def Start(current_lable2):
+        def start_stopwatch(current_lable2):
             self.running = True
             self.counter = 18000
             counter_label(current_lable2)
