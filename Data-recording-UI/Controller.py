@@ -97,15 +97,21 @@ class LoginPage(tk.Frame):
         
         # In the future will check for more stuff. Now it just checks it is not empty and email is actual email with a regular expression
         def check_credentials():
+
+            error_message = ""
+
             regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
             if not (hm.isEmpty(emailEntry.get()) and hm.isEmpty(passwordEntry.get())):
                 if re.search(regex, emailEntry.get()):
                     controller.show_frame(LogPatient)
+                else:
+                    error_message += "Incorrect format for email.\n"
             else:
-                showerror("Error", "Please enter email and password")
+                error_message += "Error", "Please enter email and/or password.\n"
 
+            if not hm.isEmpty(error_message):
+                showerror("Errors", "Please fix the following errors:\n")
 
-    
         # endregion
 
 
@@ -172,7 +178,6 @@ class LogPatient(tk.Frame):
     weightValue = 0
     heightValue = 0
     skinColorType = ""
-    raceOptionSelected = ""
     ethnicityOptionSelected = ""
     genderOptionSelected = ""
     durationValue = 0
@@ -218,12 +223,6 @@ class LogPatient(tk.Frame):
         ethnicityOptions = ttk.OptionMenu(self, self.ethnicityOptionSelected, *hm.Ethnicity)
         ethnicityOptions.grid(row=12, column=1)
 
-        raceLabel = ttk.Label(self, text="Race:", font=SMALL_FONT)
-        raceLabel.grid(row=14, column=0, padx=10, pady=10)
-        self.raceOptionSelected = tk.StringVar()
-        self.raceOptionSelected.set(hm.Race[0])  # Initial value
-        raceOptions = ttk.OptionMenu(self, self.raceOptionSelected, *hm.Race)
-        raceOptions.grid(row=14, column=1)
 
         skinColorLabel = ttk.Label(self, text="Skin Color:", font=SMALL_FONT)
         skinColorLabel.grid(row=16, column=0, padx=10, pady=10)
@@ -243,13 +242,12 @@ class LogPatient(tk.Frame):
             error = get_values()
 
             if len(error) == 0:  # no errors
-                # set up connection and send values
+
                 print(self.ageValue)
                 print(self.heightValue)
                 print(self.weightValue)
                 print(self.ethnicityOptionSelected.get())
                 print(self.genderOptionSelected.get())
-                print(self.raceOptionSelected.get())
                 print(self.skinColorType.get())
 
                 # move to recording page
@@ -280,7 +278,6 @@ class LogPatient(tk.Frame):
 
             error_message += check_scroll_down_labels(self.ethnicityOptionSelected.get(), "ethnicity",
                                                    self.genderOptionSelected.get(), "gender",
-                                                   self.raceOptionSelected.get(), "race",
                                                    self.skinColorType.get(), "skin color")
 
             error_message += check_fields_not_empty()
@@ -301,6 +298,8 @@ class LogPatient(tk.Frame):
 
             return error_message
 
+        # Assumes the parameters come ordered as follows: [scrollDown label, message to be printed], since label is
+        # 1s element it will always check the even arguments if they are empty, if so it prints the right next arg
         def check_scroll_down_labels(*arguments):
             error_msg = ""
 
@@ -343,29 +342,59 @@ class DataRecording(tk.Frame):
         bodyPartOptions = ttk.OptionMenu(self, self.bodyPartOptionSelected, *hm.BodyParts)
         bodyPartOptions.grid(row=4, column=1, padx=10, pady=10)
 
-        btnStart_Stop = ttk.Button(self, text="Start", command=lambda: start_process())
-        btnStart_Stop.grid(row=8, column=1, padx=10, pady=10)
+        btn_Start_Stop = ttk.Button(self, text="Start", command=lambda: start_stop_process())
+        btn_Start_Stop.grid(row=8, column=0, padx=10, pady=10)
 
-        save = ttk.Button(self, text="Save")
-        save.grid(row=14, column=0, padx=10, pady=10)
+        btnSave = ttk.Button(self, text="Save")
+        btnSave.grid(row=14, column=0, padx=10, pady=10)
+
+        btn_Pause_Resume = ttk.Button(self, text="Pause", command=lambda: pause_resume_process())
+        btn_Pause_Resume.grid(row=8, column=1, padx=10, pady=10)
+
 
         diffPatientButton = ttk.Button(self, text="Next Patient", command=lambda: controller.show_frame(LogPatient))
         diffPatientButton.grid(row=14, column=1, padx=10, pady=10)
 
         logOutButton = ttk.Button(self, text="Log out", command=lambda: controller.show_frame(LoginPage))
         logOutButton.grid(row=14, column=2, padx=10, pady=10)
+
+        hm.disable_fields(btn_Pause_Resume)
         # endregion
 
-        def start_process():
+        def pause_resume_process():
+
+            if is_pause_button(btn_Pause_Resume):
+                pause_process()
+
+            else:
+                resume_process()
+
+            return
+
+        def resume_process():
+
+            btn_Pause_Resume["text"] = "Pause"
+            self.running = True
+
+            return
+
+        def pause_process():
+
+            btn_Pause_Resume["text"] = "Resume"
+            self.running = False
+
+            return
+
+        def start_stop_process():
 
             errors = check_fields()
 
             if len(errors) == 0:    # no errors
 
-                if is_start_button(btnStart_Stop):
-                    start_event_handler()
+                if is_start_button(btn_Start_Stop):
+                    start_process()
                 else:
-                    stop_event_handler()
+                    stop_process()
 
             else:
                 showerror("Errors", "Please fix the following errors:\n" + errors)
@@ -375,8 +404,13 @@ class DataRecording(tk.Frame):
         def is_start_button(button):
             return button["text"] == "Start"
 
-        def start_event_handler():
-            btnStart_Stop["text"] = "Stop"
+        def is_pause_button(button):
+            return button["text"] == "Pause"
+
+        def start_process():
+            hm.enable_fields(btn_Pause_Resume)
+
+            btn_Start_Stop["text"] = "Stop"
 
             self.timer = tk.Label(self, text="Welcome!", fg="black", font="Verdana 15 bold")
             self.timer.grid(row=10, column=1, padx=10, pady=10)
@@ -384,8 +418,10 @@ class DataRecording(tk.Frame):
             start_stopwatch(self.timer)
             return
 
-        def stop_event_handler():
-            btnStart_Stop["text"] = "Start"
+        def stop_process():
+            hm.disable_fields(btn_Pause_Resume)
+
+            btn_Start_Stop["text"] = "Start"
 
             self.running = False
             self.timer.destroy()
