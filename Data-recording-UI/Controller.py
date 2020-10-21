@@ -5,6 +5,7 @@ from tkinter import ttk, Entry
 import HelperMethods as hm
 from tkinter.messagebox import showerror
 import threading
+from PIL import Image, ImageTk
 
 
 class Controller(tk.Tk):
@@ -51,29 +52,59 @@ class LoginPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
+        passwordBullets = "\u2022" # Bullet points for password security
+
         # region Design
         welcomeLabel = ttk.Label(self, text="Welcome to the BMI reading Platform", font=LARGE_FONT)
         welcomeLabel.pack(pady=10, padx=10)
 
-        emailLabel = ttk.Label(self, text="Email", font=SMALL_FONT)
+        # Picture for paws up
+        pawsUpImage = ImageTk.PhotoImage(Image.open("./images/pawsUpImage.gif"))
+        pawsUpImageLabel = tk.Label(self, image=pawsUpImage)
+        pawsUpImageLabel.image = pawsUpImage
+        pawsUpImageLabel.pack()
+        
+        # Email Label and entry box
+        emailLabel = ttk.Label(self, text="Email *", font=SMALL_FONT)
         emailLabel.pack(pady=10, padx=10)
         emailEntry = ttk.Entry(self)
         emailEntry.pack()
 
-        passwordLabel = ttk.Label(self, text="Password", font=SMALL_FONT)
+        # Password label and entry box
+        passwordLabel = ttk.Label(self, text="Password *", font=SMALL_FONT)
         passwordLabel.pack(pady=10, padx=10)
-        passwordEntry = ttk.Entry(self)
+        passwordEntry = ttk.Entry(self, show=passwordBullets)
         passwordEntry.pack()
 
-        logInButton = ttk.Button(self, text="Log In", command=lambda: controller.show_frame(LogPatient))
-        logInButton.pack(pady=10, padx=10)
+        #region Buttons
 
+        # Login
+        logInButton = ttk.Button(self, text="Log In", command=lambda: check_credentials())
+        logInButton.pack(pady=10)
+
+        # Signup
         signUpButton = ttk.Button(self, text="Sign Up", command=lambda: controller.show_frame(SignUp))
-        signUpButton.pack(pady=10, padx=10)
+        signUpButton.pack()
 
-        fgtPWButton = ttk.Button(self, text="Forgot Password", command=lambda: controller.show_frame(ResetPW))
-        fgtPWButton.pack(pady=10, padx=10)
+        # Forgot Password 
+        forgotPasswordPWButton = ttk.Button(self, text="Forgot Password", command=lambda: controller.show_frame(ResetPW))
+        forgotPasswordPWButton.pack(pady=20, padx=10)
         # endregion
+        # endregion
+
+        # region Methods
+
+        # In the future will check for more stuff. Now it just checks it is not empty
+        def check_credentials():
+            if not (hm.isEmpty(emailEntry.get()) and hm.isEmpty(passwordEntry.get())):
+                controller.show_frame(LogPatient)
+            else:
+                showerror("Error", "Please enter email and password")
+
+
+    
+        # endregion
+
 
 
 class SignUp(tk.Frame):
@@ -133,7 +164,7 @@ class ResetPW(tk.Frame):
 
 
 class LogPatient(tk.Frame):
-    # values for all labels
+    # values for all entries
     ageValue = 0
     weightValue = 0
     heightValue = 0
@@ -201,7 +232,8 @@ class LogPatient(tk.Frame):
         saveButton = ttk.Button(self, text="Save and Continue", command=lambda: save_and_goToRecordingPage())
         saveButton.grid(row=26, column=1, padx=10, pady=30)
         # endregion
-
+        
+        # region methods
         def save_and_goToRecordingPage():
             # get_values stores all values from fields into variables and returns any errors found when trying to
             # convert each field into its respective type
@@ -221,7 +253,7 @@ class LogPatient(tk.Frame):
                 controller.show_frame(DataRecording)
             else:
                 # display pop-up dialog box with error message
-                showerror("Errors", "Please fix the following errors:\n" + error)
+                showerror("Errors", "Please fix the following errors:\n\n" + error)
                 return
 
         def get_values():
@@ -231,17 +263,17 @@ class LogPatient(tk.Frame):
             try:
                 self.ageValue = int(ageEntry.get())
             except ValueError:
-                error_message += "Value entered for age is not a number.\n"
+                error_message += "\u2022    " + "Value entered for age is not a number.\n"
 
             try:
                 self.heightValue = float(heightEntry.get())
             except ValueError:
-                error_message += "Value entered for height is not a number.\n"
+                error_message += "\u2022    " + "Value entered for height is not a number.\n"
 
             try:
                 self.weightValue = int(weightEntry.get())
             except ValueError:
-                error_message += "Value entered for weight is not a number.\n"
+                error_message += "\u2022    " + "Value entered for weight is not a number.\n"
 
             error_message += check_scroll_down_labels(self.ethnicityOptionSelected.get(), "ethnicity",
                                                    self.genderOptionSelected.get(), "gender",
@@ -256,13 +288,13 @@ class LogPatient(tk.Frame):
             error_message = ""
 
             if not hm.isAgeValid(self.ageValue):
-                error_message += "Value of age is invalid.\n"
+                error_message += "\u2022    " + "Value of age is invalid.\n"
 
             if not hm.isWeightValid(self.weightValue):
-                error_message += "Value of weight is invalid.\n"
+                error_message += "\u2022    " + "Value of weight is invalid.\n"
 
             if not hm.isHeightValid(self.heightValue):
-                error_message += "Value of height is invalid.\n"
+                error_message += "\u2022    " + "Value of height is invalid.\n"
 
             return error_message
 
@@ -273,10 +305,12 @@ class LogPatient(tk.Frame):
             for argument in arguments:
                 if count % 2 == 0:
                     if (hm.isScrollDownMenuWrong(argument)):
-                        error_msg += "Please select an option for " + arguments[count + 1] + ".\n"
+                        error_msg += "\u2022    " + "Please select an option for " + arguments[count + 1] + ".\n"
                 count += 1
 
             return error_msg
+
+        # endregion
 
 
 class DataRecording(tk.Frame):
