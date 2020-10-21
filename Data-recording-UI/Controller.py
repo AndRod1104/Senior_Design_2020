@@ -6,6 +6,7 @@ import HelperMethods as hm
 from tkinter.messagebox import showerror
 import threading
 from PIL import Image, ImageTk
+import re
 
 
 class Controller(tk.Tk):
@@ -93,11 +94,13 @@ class LoginPage(tk.Frame):
         # endregion
 
         # region Methods
-
-        # In the future will check for more stuff. Now it just checks it is not empty
+        
+        # In the future will check for more stuff. Now it just checks it is not empty and email is actual email with a regular expression
         def check_credentials():
+            regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
             if not (hm.isEmpty(emailEntry.get()) and hm.isEmpty(passwordEntry.get())):
-                controller.show_frame(LogPatient)
+                if re.search(regex, emailEntry.get()):
+                    controller.show_frame(LogPatient)
             else:
                 showerror("Error", "Please enter email and password")
 
