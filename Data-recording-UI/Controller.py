@@ -105,12 +105,12 @@ class LoginPage(tk.Frame):
                 if re.search(regex, emailEntry.get()):
                     controller.show_frame(LogPatient)
                 else:
-                    error_message += "Incorrect format for email.\n"
+                    error_message += "\u2022    Incorrect format for email.\n"
             else:
-                error_message += "Error", "Please enter email and/or password.\n"
+                error_message += "\u2022    Please enter email and/or password.\n"
 
             if not hm.isEmpty(error_message):
-                showerror("Errors", "Please fix the following errors:\n")
+                showerror("Errors", "Please fix the following errors:\n" + error_message)
 
         # endregion
 
@@ -320,7 +320,7 @@ class DataRecording(tk.Frame):
 
     # stopwatch
     running = False
-    counter = 0
+    counter = 18000
     timer = ""
 
     def __init__(self, parent, controller):
@@ -374,8 +374,7 @@ class DataRecording(tk.Frame):
         def resume_process():
 
             btn_Pause_Resume["text"] = "Pause"
-            self.running = True
-
+            start_stopwatch(self.timer)
             return
 
         def pause_process():
@@ -393,8 +392,12 @@ class DataRecording(tk.Frame):
 
                 if is_start_button(btn_Start_Stop):
                     start_process()
+                    hm.disable_fields(btnSave, logOutButton, diffPatientButton)
+                    self.counter = 18000  # we need to reset the timer after 1st recording
                 else:
                     stop_process()
+                    btn_Pause_Resume["text"] = "Pause"  # if stop the recording, we need to reset this button (bug)
+                    hm.enable_fields(btnSave, logOutButton, diffPatientButton)
 
             else:
                 showerror("Errors", "Please fix the following errors:\n" + errors)
@@ -438,7 +441,7 @@ class DataRecording(tk.Frame):
 
         def start_stopwatch(current_lable2):
             self.running = True
-            self.counter = 18000
+            #self.counter = 18000
             counter_label(current_lable2)
 
         def counter_label(current_label):
