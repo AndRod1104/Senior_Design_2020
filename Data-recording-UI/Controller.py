@@ -91,6 +91,7 @@ class LoginPage(tk.Frame):
         forgotPasswordPWButton = ttk.Button(self, text="Forgot Password", command=lambda: controller.show_frame(ResetPW))
         forgotPasswordPWButton.pack(pady=20, padx=10)
         # endregion
+
         # endregion
 
         # region Methods
@@ -100,7 +101,7 @@ class LoginPage(tk.Frame):
 
             error_message = ""
 
-            regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+            regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
             if not (hm.isEmpty(emailEntry.get()) and hm.isEmpty(passwordEntry.get())):
                 if re.search(regex, emailEntry.get()):
                     controller.show_frame(LogPatient)
