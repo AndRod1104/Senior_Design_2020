@@ -6,7 +6,7 @@ import HelperMethods as hm
 from tkinter.messagebox import showerror
 import threading
 from PIL import Image, ImageTk
-import re
+
 
 
 class Controller(tk.Tk):
@@ -101,9 +101,8 @@ class LoginPage(tk.Frame):
 
             error_message = ""
 
-            regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
             if not (hm.isEmpty(emailEntry.get()) and hm.isEmpty(passwordEntry.get())):
-                if re.search(regex, emailEntry.get()):
+                if hm.check_email_format(emailEntry.get()):
                     controller.show_frame(LogPatient)
                 else:
                     error_message += "\u2022    Incorrect format for email.\n"
@@ -118,41 +117,106 @@ class LoginPage(tk.Frame):
 
 
 class SignUp(tk.Frame):
+    firstName = ""
+    middleInitial = ""
+    lastName = ""
+    email = ""
+    institution = ""
+
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
         # region Design
         welcomeLabel = ttk.Label(self, text="New Researcher", font=LARGE_FONT)
-        welcomeLabel.pack(pady=10, padx=10)
+        welcomeLabel.grid(row=0, column=1, pady=10)
 
-        fNameLabel = ttk.Label(self, text="First Name", font=SMALL_FONT)
-        fNameLabel.pack(pady=10, padx=10)
+        fNameLabel = ttk.Label(self, text="First Name *", font=SMALL_FONT)
+        fNameLabel.grid(row=2, column=0, padx=0, pady=10)
         fNameEntry = ttk.Entry(self)
-        fNameEntry.pack()
+        fNameEntry.grid(row=2, column=1)
 
-        mInitialLabel = ttk.Label(self, text="Middle Initial", font=SMALL_FONT)
-        mInitialLabel.pack(pady=10, padx=10)
-        mInEntry = ttk.Entry(self)
-        mInEntry.pack()
+        mInitialLabel = ttk.Label(self, text="Middle Initial *", font=SMALL_FONT)
+        mInitialLabel.grid(row=4, column=0, padx=10, pady=10)
+        middleInitialEntry = ttk.Entry(self)
+        middleInitialEntry.grid(row=4, column=1)
 
-        lNameLabel = ttk.Label(self, text="Last Name", font=SMALL_FONT)
-        lNameLabel.pack(pady=10, padx=10)
+        lNameLabel = ttk.Label(self, text="Last Name *", font=SMALL_FONT)
+        lNameLabel.grid(row=8, column=0, padx=10, pady=10)
         lNameEntry = ttk.Entry(self)
-        lNameEntry.pack()
+        lNameEntry.grid(row=8, column=1)
 
-        emailLabel = ttk.Label(self, text="Email", font=SMALL_FONT)
-        emailLabel.pack(pady=10, padx=10)
+        emailLabel = ttk.Label(self, text="Email *", font=SMALL_FONT)
+        emailLabel.grid(row=10, column=0, padx=10, pady=10)
         emailEntry = ttk.Entry(self)
-        emailEntry.pack()
+        emailEntry.grid(row=10, column=1)
 
-        instLabel = ttk.Label(self, text="Institution", font=SMALL_FONT)
-        instLabel.pack(pady=10, padx=10)
+        instLabel = ttk.Label(self, text="Institution *", font=SMALL_FONT)
+        instLabel.grid(row=12, column=0, padx=10, pady=10)
         instEntry = ttk.Entry(self)
-        instEntry.pack()
+        instEntry.grid(row=12, column=1)
 
-        signUpButton = ttk.Button(self, text="Sign Up", command=lambda: controller.show_frame(LoginPage))
-        signUpButton.pack(pady=30, padx=10)
+        passwordLabel = ttk.Label(self, text="Password *", font=SMALL_FONT)
+        passwordLabel.grid(row=14, column=0, pady=10)
+        passwordEntry = ttk.Entry(self, show="*")
+        passwordEntry.grid(row=14, column=1, pady=10)
+
+        retypePasswordLabel = ttk.Label(self, text="Retype password *", font=SMALL_FONT)
+        retypePasswordLabel.grid(row=16, column=0, pady=10)
+        retypePasswordEntry = ttk.Entry(self, show="*")
+        retypePasswordEntry.grid(row=16, column=1, pady=10)
+
+        
+
+        signUpButton = ttk.Button(self, text="Sign Up", command=lambda: signUp())
+        signUpButton.grid(row=18, column=1, pady=10)
+
+        alreadyHaveAnAccount = ttk.Button(self, text="Already have an Account? Login", command=lambda: controller.show_frame(LoginPage))
+        alreadyHaveAnAccount.grid(row=20, column=1)
+
+        # region Methods
+        
+        def signUp():
+            # check if fields are empty
+            error_message = check_fields_not_empty()
+            if len(error_message) > 0:
+                showerror("Error", "Please fix the following errors\n" + error_message)
+
+            # check for email configuration
+            if not hm.check_email_format(emailEntry.get()):
+                print("Please input a proper email")
+
+            # check that the passwords match
+            if check_if_password_fields_match():
+                print('Password fields do not match')
+            
+            
+
+        #this is not working as it should will work on the comparison later
+        def check_if_password_fields_match():
+            if passwordEntry.get() == retypePasswordEntry.get():
+                return True
+            return False
+
+
+
+        def check_fields_not_empty():
+            error_message = ""
+
+            if hm.isEmpty(fNameEntry.get()):
+                error_message += "\u2022    " + "Please fill out the First Name Field\n"
+            if hm.isEmpty(middleInitialEntry.get()):
+                error_message += "\u2022    " + "Please fill out the Middle Initial Field\n"
+            if hm.isEmpty(lNameEntry.get()):
+                error_message += "\u2022    " + "Please fill out the Last Name Field\n"
+            if hm.isEmpty(emailEntry.get()):
+                error_message += "\u2022    " + "Please fill out the Email Field\n"
+            if hm.isEmpty(instEntry.get()):
+                error_message += "\u2022    " + "Please fill out the Institution Field\n"
+
+            return error_message
+
+        # endregion
 
 
 class ResetPW(tk.Frame):
@@ -278,8 +342,8 @@ class LogPatient(tk.Frame):
                 error_message += "\u2022    " + "Value entered for weight is not a number.\n"
 
             error_message += check_scroll_down_labels(self.ethnicityOptionSelected.get(), "ethnicity",
-                                                   self.genderOptionSelected.get(), "gender",
-                                                   self.skinColorType.get(), "skin color")
+                                                      self.genderOptionSelected.get(), "gender",
+                                                      self.skinColorType.get(), "skin color")
 
             error_message += check_fields_not_empty()
 

@@ -1,3 +1,4 @@
+import re
 # region Min-Max values
 MIN_AGE = 18
 MAX_AGE = 100
@@ -82,3 +83,9 @@ def enable_fields(*fields):
 
 def isDurationValid(duration):
     return MIN_DURATION < duration < MAX_DURATION
+
+def check_email_format(email):
+    regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+    if re.search(regex, email):
+        return True
+    return False
