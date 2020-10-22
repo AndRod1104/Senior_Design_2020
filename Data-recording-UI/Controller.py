@@ -175,7 +175,9 @@ class SignUp(tk.Frame):
         alreadyHaveAnAccount.grid(row=20, column=1)
 
         # region Methods
-        
+        #TODO
+        # fix this: sign up should do the actual signing up and connect to DB, not collect the errors, there should be
+        # another function that is being called by this one that does that
         def signUp():
             # check if fields are empty
             error_message = check_fields_not_empty()
@@ -302,26 +304,21 @@ class LogPatient(tk.Frame):
         
         # region methods
         def save_and_goToRecordingPage():
-            # get_values stores all values from fields into variables and returns any errors found when trying to
-            # convert each field into its respective type
-            error = get_values()
 
-            if len(error) == 0:  # no errors
-
+            if get_values():
                 print(self.ageValue)
                 print(self.heightValue)
                 print(self.weightValue)
                 print(self.ethnicityOptionSelected.get())
                 print(self.genderOptionSelected.get())
                 print(self.skinColorType.get())
-
                 # move to recording page
                 controller.show_frame(DataRecording)
-            else:
-                # display pop-up dialog box with error message
-                showerror("Errors", "Please fix the following errors:\n\n" + error)
-                return
 
+            return
+
+        # get_values stores all values from fields into variables and returns any errors found when trying to
+        # convert each field into its respective type
         def get_values():
 
             error_message = ""
@@ -345,11 +342,16 @@ class LogPatient(tk.Frame):
                                                       self.genderOptionSelected.get(), "gender",
                                                       self.skinColorType.get(), "skin color")
 
-            error_message += check_fields_not_empty()
+            error_message += numbers_in_correct_range()
 
-            return error_message
+            if len(error_message) > 0:
+                # display pop-up dialog box with error message
+                showerror("Errors", "Please fix the following errors:\n\n" + error_message)
+                return False
 
-        def check_fields_not_empty():
+            return True
+
+        def numbers_in_correct_range():
             error_message = ""
 
             if not hm.isAgeValid(self.ageValue):
@@ -382,6 +384,7 @@ class LogPatient(tk.Frame):
 
 class DataRecording(tk.Frame):
     bodyPartOptionSelected = ""
+    durationValue = 0
 
     # stopwatch
     running = False
@@ -399,6 +402,11 @@ class DataRecording(tk.Frame):
         idLabel.grid(row=2, column=0, padx=0, pady=10)
         idVal = ttk.Label(self, text="001", font=SMALL_FONT)      # Interactive get subjID from DB
         idVal.grid(row=2, column=1)
+
+        durationLabel = ttk.Label(self, text="Duration:", font=SMALL_FONT)
+        durationLabel.grid(row=5, column=0, padx=0, pady=10)
+        durationEntry = ttk.Entry(self)
+        durationEntry.grid(row=5, column=1)
 
         bodyPartLabel = ttk.Label(self, text="Body Location:", font=SMALL_FONT)
         bodyPartLabel.grid(row=4, column=0, padx=0, pady=10)
@@ -430,9 +438,10 @@ class DataRecording(tk.Frame):
 
             if is_pause_button(btn_Pause_Resume):
                 pause_process()
-
             else:
-                resume_process()
+                # check if no errors when re-entering fields
+                if check_fields():
+                    resume_process()
 
             return
 
@@ -440,32 +449,29 @@ class DataRecording(tk.Frame):
 
             btn_Pause_Resume["text"] = "Pause"
             start_stopwatch(self.timer)
+            hm.disable_fields(bodyPartOptions, durationEntry)
+
+            #TODO
+            # Connect to save again values with different body part in DB
+            print(self.durationValue)
+            print(self.bodyPartOptionSelected.get())
+
             return
 
         def pause_process():
 
             btn_Pause_Resume["text"] = "Resume"
             self.running = False
-
+            hm.enable_fields(bodyPartOptions, durationEntry)
             return
 
         def start_stop_process():
 
-            errors = check_fields()
-
-            if len(errors) == 0:    # no errors
-
+            if check_fields():    # no errors
                 if is_start_button(btn_Start_Stop):
                     start_process()
-                    hm.disable_fields(btnSave, logOutButton, diffPatientButton)
-                    self.counter = 18000  # we need to reset the timer after 1st recording
                 else:
                     stop_process()
-                    btn_Pause_Resume["text"] = "Pause"  # if stop the recording, we need to reset this button (bug)
-                    hm.enable_fields(btnSave, logOutButton, diffPatientButton)
-
-            else:
-                showerror("Errors", "Please fix the following errors:\n" + errors)
 
             return
 
@@ -476,12 +482,14 @@ class DataRecording(tk.Frame):
             return button["text"] == "Pause"
 
         def start_process():
-            hm.enable_fields(btn_Pause_Resume)
 
+            hm.disable_fields(btnSave, logOutButton, diffPatientButton, bodyPartOptions, durationEntry)
+            hm.enable_fields(btn_Pause_Resume)
             btn_Start_Stop["text"] = "Stop"
 
             self.timer = tk.Label(self, text="Welcome!", fg="black", font="Verdana 15 bold")
             self.timer.grid(row=10, column=1, padx=10, pady=10)
+            self.counter = 18000  # we need to reset the timer after 1st recording
 
             start_stopwatch(self.timer)
             return
@@ -489,24 +497,40 @@ class DataRecording(tk.Frame):
         def stop_process():
             hm.disable_fields(btn_Pause_Resume)
 
+            btn_Pause_Resume["text"] = "Pause"  # if stop the recording, we need to reset this button (bug)
             btn_Start_Stop["text"] = "Start"
+
+            hm.enable_fields(btnSave, logOutButton, diffPatientButton, bodyPartOptions, durationEntry)
 
             self.running = False
             self.timer.destroy()
             return
 
+        # checks for any errors, prints them and returns False, otherwise no errors and returns True
         def check_fields():
 
             error_message = ""
 
+            try:
+                self.durationValue = int(durationEntry.get())
+
+                # This was moved here, because there is no need to print this error if above already failed
+                if not hm.isDurationValid(self.durationValue):
+                    error_message += "\u2022    " + "Value entered for duration is invalid.\n"
+            except ValueError:
+                error_message += "\u2022    " + "Value entered for duration is not a number.\n"
+
             if hm.isScrollDownMenuWrong(self.bodyPartOptionSelected.get()):
                 error_message += "Please select an option for body part"
 
-            return error_message
+            if len(error_message) > 0:
+                showerror("Errors", "Please fix the following errors:\n" + error_message)
+                return False
+
+            return True
 
         def start_stopwatch(current_lable2):
             self.running = True
-            #self.counter = 18000
             counter_label(current_lable2)
 
         def counter_label(current_label):

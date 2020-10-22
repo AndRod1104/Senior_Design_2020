@@ -63,7 +63,6 @@ def isScrollDownMenuWrong(option):
     return option == DEFAULT_SCROLLDOWNMENU_OPTION
 
 
-# may not be used
 def isEmpty(field):
     return len(field) == 0
 
@@ -76,10 +75,10 @@ def disable_fields(*fields):
     for field in fields:
         field["state"] = "disabled"
 
-
 def enable_fields(*fields):
     for field in fields:
         field["state"] = "normal"
+
 
 def isDurationValid(duration):
     return MIN_DURATION < duration < MAX_DURATION
