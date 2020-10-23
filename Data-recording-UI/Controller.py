@@ -95,25 +95,16 @@ class LoginPage(tk.Frame):
         # endregion
 
         # region Methods
-        
-        # In the future will check for more stuff. Now it just checks it is not empty and email is actual email with a regular expression
         def check_credentials():
 
-            error_message = ""
+            if hm.check_fields_inputs(
+                    emailEntry=emailEntry,
+                    passwordEntry=passwordEntry,
+                    checkEmailFormat=emailEntry.get()):
 
-            if not (hm.isEmpty(emailEntry.get()) and hm.isEmpty(passwordEntry.get())):
-                if hm.check_email_format(emailEntry.get()):
-                    controller.show_frame(LogPatient)
-                else:
-                    error_message += "\u2022    Incorrect format for email.\n"
-            else:
-                error_message += "\u2022    Please enter email and/or password.\n"
-
-            if not hm.isEmpty(error_message):
-                showerror("Errors", "Please fix the following errors:\n" + error_message)
+                controller.show_frame(LogPatient)
 
         # endregion
-
 
 
 class SignUp(tk.Frame):
@@ -166,57 +157,38 @@ class SignUp(tk.Frame):
         retypePasswordEntry = ttk.Entry(self, show="*")
         retypePasswordEntry.grid(row=16, column=1, pady=10)
 
-        
-
         signUpButton = ttk.Button(self, text="Sign Up", command=lambda: signUp())
         signUpButton.grid(row=18, column=1, pady=10)
 
         alreadyHaveAnAccount = ttk.Button(self, text="Already have an Account? Login", command=lambda: controller.show_frame(LoginPage))
         alreadyHaveAnAccount.grid(row=20, column=1)
+        # endregion
 
         # region Methods
-        #TODO
-        # fix this: sign up should do the actual signing up and connect to DB, not collect the errors, there should be
-        # another function that is being called by this one that does that
         def signUp():
-            # check if fields are empty
-            error_message = check_fields_not_empty()
-            if len(error_message) > 0:
-                showerror("Error", "Please fix the following errors\n" + error_message)
+            # check if fields are empty, if password match and if email is in correct format
+            if hm.check_fields_inputs(
+                    fNameEntry=fNameEntry,
+                    middleInitialEntry=middleInitialEntry,
+                    lNameEntry=lNameEntry,
+                    instEntry=instEntry,
+                    passwordEntry=passwordEntry,
+                    reEnterPasswordEntry=retypePasswordEntry,
+                    emailEntry=emailEntry,
+                    checkEmailFormat=emailEntry.get(),
+                    ):
+                get_values()
+                print(self.firstName)
+                print(self.middleInitial)
+                print(self.lastName)
+                print(self.institution)
 
-            # check for email configuration
-            if not hm.check_email_format(emailEntry.get()):
-                print("Please input a proper email")
-
-            # check that the passwords match
-            if check_if_password_fields_match():
-                print('Password fields do not match')
-            
-            
-
-        #this is not working as it should will work on the comparison later
-        def check_if_password_fields_match():
-            if passwordEntry.get() == retypePasswordEntry.get():
-                return True
-            return False
-
-
-
-        def check_fields_not_empty():
-            error_message = ""
-
-            if hm.isEmpty(fNameEntry.get()):
-                error_message += "\u2022    " + "Please fill out the First Name Field\n"
-            if hm.isEmpty(middleInitialEntry.get()):
-                error_message += "\u2022    " + "Please fill out the Middle Initial Field\n"
-            if hm.isEmpty(lNameEntry.get()):
-                error_message += "\u2022    " + "Please fill out the Last Name Field\n"
-            if hm.isEmpty(emailEntry.get()):
-                error_message += "\u2022    " + "Please fill out the Email Field\n"
-            if hm.isEmpty(instEntry.get()):
-                error_message += "\u2022    " + "Please fill out the Institution Field\n"
-
-            return error_message
+        def get_values():
+            self.firstName = fNameEntry.get()
+            self.middleInitial = middleInitialEntry.get()
+            self.lastName = lNameEntry.get()
+            self.email = emailEntry.get()
+            self.institution = instEntry.get()
 
         # endregion
 
@@ -321,64 +293,20 @@ class LogPatient(tk.Frame):
         # convert each field into its respective type
         def get_values():
 
-            error_message = ""
+            if hm.check_fields_inputs(
+                    ageEntry=ageEntry,
+                    heightEntry=heightEntry,
+                    weightEntry=weightEntry,
+                    ethnicityOption=self.ethnicityOptionSelected.get(),
+                    genderOption=self.genderOptionSelected.get(),
+                    skinColorOption=self.skinColorType.get()):
 
-            try:
                 self.ageValue = int(ageEntry.get())
-            except ValueError:
-                error_message += "\u2022    " + "Value entered for age is not a number.\n"
-
-            try:
                 self.heightValue = float(heightEntry.get())
-            except ValueError:
-                error_message += "\u2022    " + "Value entered for height is not a number.\n"
-
-            try:
                 self.weightValue = int(weightEntry.get())
-            except ValueError:
-                error_message += "\u2022    " + "Value entered for weight is not a number.\n"
-
-            error_message += check_scroll_down_labels(self.ethnicityOptionSelected.get(), "ethnicity",
-                                                      self.genderOptionSelected.get(), "gender",
-                                                      self.skinColorType.get(), "skin color")
-
-            error_message += numbers_in_correct_range()
-
-            if len(error_message) > 0:
-                # display pop-up dialog box with error message
-                showerror("Errors", "Please fix the following errors:\n\n" + error_message)
+                return True
+            else:
                 return False
-
-            return True
-
-        def numbers_in_correct_range():
-            error_message = ""
-
-            if not hm.isAgeValid(self.ageValue):
-                error_message += "\u2022    " + "Value of age is invalid.\n"
-
-            if not hm.isWeightValid(self.weightValue):
-                error_message += "\u2022    " + "Value of weight is invalid.\n"
-
-            if not hm.isHeightValid(self.heightValue):
-                error_message += "\u2022    " + "Value of height is invalid.\n"
-
-            return error_message
-
-        # Assumes the parameters come ordered as follows: [scrollDown label, message to be printed], since label is
-        # 1s element it will always check the even arguments if they are empty, if so it prints the right next arg
-        def check_scroll_down_labels(*arguments):
-            error_msg = ""
-
-            count = 0
-            for argument in arguments:
-                if count % 2 == 0:
-                    if (hm.isScrollDownMenuWrong(argument)):
-                        error_msg += "\u2022    " + "Please select an option for " + arguments[count + 1] + ".\n"
-                count += 1
-
-            return error_msg
-
         # endregion
 
 
@@ -430,13 +358,13 @@ class DataRecording(tk.Frame):
 
         logOutButton = ttk.Button(self, text="Log out", command=lambda: controller.show_frame(LoginPage))
         logOutButton.grid(row=14, column=2, padx=10, pady=10)
+        # endregion
 
         hm.disable_fields(btn_Pause_Resume)
-        # endregion
 
         def pause_resume_process():
 
-            if is_pause_button(btn_Pause_Resume):
+            if hm.is_pause_button(btn_Pause_Resume):
                 pause_process()
             else:
                 # check if no errors when re-entering fields
@@ -468,18 +396,13 @@ class DataRecording(tk.Frame):
         def start_stop_process():
 
             if check_fields():    # no errors
-                if is_start_button(btn_Start_Stop):
+                if hm.is_start_button(btn_Start_Stop):
                     start_process()
                 else:
                     stop_process()
 
             return
 
-        def is_start_button(button):
-            return button["text"] == "Start"
-
-        def is_pause_button(button):
-            return button["text"] == "Pause"
 
         def start_process():
 
@@ -509,26 +432,15 @@ class DataRecording(tk.Frame):
         # checks for any errors, prints them and returns False, otherwise no errors and returns True
         def check_fields():
 
-            error_message = ""
+            if hm.check_fields_inputs(durationEntry=durationEntry, bodyPartOption=self.bodyPartOptionSelected.get()):
 
-            try:
                 self.durationValue = int(durationEntry.get())
+                return True
 
-                # This was moved here, because there is no need to print this error if above already failed
-                if not hm.isDurationValid(self.durationValue):
-                    error_message += "\u2022    " + "Value entered for duration is invalid.\n"
-            except ValueError:
-                error_message += "\u2022    " + "Value entered for duration is not a number.\n"
-
-            if hm.isScrollDownMenuWrong(self.bodyPartOptionSelected.get()):
-                error_message += "Please select an option for body part"
-
-            if len(error_message) > 0:
-                showerror("Errors", "Please fix the following errors:\n" + error_message)
+            else:
                 return False
 
-            return True
-
+        # region Stopwatch
         def start_stopwatch(current_lable2):
             self.running = True
             counter_label(current_lable2)
@@ -551,6 +463,7 @@ class DataRecording(tk.Frame):
                     self.counter += 1
             # Triggering the start of the counter.
             count()
+        # endregion
 
 
 app = Controller()
