@@ -182,16 +182,21 @@ def check_fields_inputs(ageEntry=None, heightEntry=None, weightEntry=None, durat
         if not passwords_match(passwordEntry.get(), reEnterPasswordEntry.get()):
             error_message += "\u2022    " + "Passwords do not match.\n"
 
-    if isEmpty(fNameEntry.get()):
-        error_message += "\u2022    " + "Please fill out the First Name Field\n"
-    if isEmpty(middleInitialEntry.get()):
-        error_message += "\u2022    " + "Please fill out the Middle Initial Field\n"
-    if isEmpty(lNameEntry.get()):
-        error_message += "\u2022    " + "Please fill out the Last Name Field\n"
-    if isEmpty(emailEntry.get()):
-        error_message += "\u2022    " + "Please fill out the Email Field\n"
-    if isEmpty(instEntry.get()):
-        error_message += "\u2022    " + "Please fill out the Institution Field\n"
+    if fNameEntry is not None:
+        if isEmpty(fNameEntry.get()):
+            error_message += "\u2022    " + "Please fill out the First Name Field\n"
+    if middleInitialEntry is not None:
+        if isEmpty(middleInitialEntry.get()):
+            error_message += "\u2022    " + "Please fill out the Middle Initial Field\n"
+    if lNameEntry is not None:
+        if isEmpty(lNameEntry.get()):
+            error_message += "\u2022    " + "Please fill out the Last Name Field\n"
+    if emailEntry is not None:
+        if isEmpty(emailEntry.get()):
+            error_message += "\u2022    " + "Please fill out the Email Field\n"
+    if instEntry is not None:
+        if isEmpty(instEntry.get()):
+            error_message += "\u2022    " + "Please fill out the Institution Field\n"
 
     # final check for errors
     if isEmpty(error_message):
