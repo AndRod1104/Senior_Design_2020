@@ -342,26 +342,47 @@ class DataRecording(tk.Frame):
         self.body_part_option_selected = tk.StringVar()
         self.body_part_option_selected.set(hm.BodyParts[0])  # Initial Value
         body_part_options = ttk.OptionMenu(self, self.body_part_option_selected, *hm.BodyParts)
-        body_part_options.grid(row=4, column=1, padx=10, pady=10)
+        body_part_options.grid(row=4, column=1, padx=0, pady=10)
 
         btn_start_stop = ttk.Button(self, text="Start", command=lambda: start_stop_process())
-        btn_start_stop.grid(row=8, column=0, padx=10, pady=10)
+        btn_start_stop.grid(row=8, column=0, padx=0, pady=10)
 
-        btn_save = ttk.Button(self, text="Save")
-        btn_save.grid(row=14, column=0, padx=10, pady=10)
+        btn_save = ttk.Button(self, text="Save", command=lambda: save_recording())
+        btn_save.grid(row=14, column=0, padx=0, pady=10)
 
         btn_pause_resume = ttk.Button(self, text="Pause", command=lambda: pause_resume_process())
-        btn_pause_resume.grid(row=8, column=1, padx=10, pady=10)
+        btn_pause_resume.grid(row=8, column=1, padx=0, pady=10)
 
 
         diff_patient_button = ttk.Button(self, text="Next Patient", command=lambda: controller.show_frame(LogPatient))
-        diff_patient_button.grid(row=14, column=1, padx=10, pady=10)
+        diff_patient_button.grid(row=14, column=1, padx=0, pady=10)
 
         log_out_button = ttk.Button(self, text="Log out", command=lambda: controller.show_frame(LoginPage))
-        log_out_button.grid(row=14, column=2, padx=10, pady=10)
+        log_out_button.grid(row=14, column=2, padx=0, pady=10)
+
+        checkbox_value = tk.IntVar()
+        check_box_label = tk.Checkbutton(self, text="Interrupted session", variable=checkbox_value)
+
+        check_box_label.grid(row=15, padx=0, pady=10)
         # endregion
 
         hm.disable_fields(btn_pause_resume)
+
+        def save_recording():
+            if checkbox_value.get() == 1:    # If interrupted session
+
+                # TODO: Message box will probably have to be a customized pop-up. You can't add an entry text field here
+                result = tk.messagebox.askyesno("Interrupted session", "You have marked this session as interrupted.\n"
+                                                                       "Data will be saved in different database")
+                if result:     # If user confirmed session was interrupted and he/she agrees with message
+                    # TODO: Data in different database
+                    print("Result:")
+                    print(result)
+
+            else:   # normal session
+                print(self.duration_value)
+
+            return
 
         def pause_resume_process():
 
