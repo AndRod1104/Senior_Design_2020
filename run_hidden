@@ -1,0 +1,4 @@
+#!/bin/bash
+cd ~/PiSpec20_oceanoptics-master/PiSpec20_oceanoptics/
+screen -dm python3 OO_spec.py
+exit
