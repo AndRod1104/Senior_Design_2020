@@ -1,7 +1,7 @@
 import re
 from tkinter.messagebox import showerror
 # region Min-Max values
-MIN_AGE = 18
+MIN_AGE = 17
 MAX_AGE = 100
 
 MIN_WEIGHT = 0
@@ -20,22 +20,19 @@ DEFAULT_SCROLLDOWNMENU_OPTION = "Select an option"
 
 Ethnicity = ["Select an option",
              "American Indian",
+             "Alaska Native",
+             "Native Hawaiian or Other Pacific Islander",
              "Asian",
              "African American",
-             "Native Hawaiian or Other Pacific Islander",
              "White",
-             "Hispanic or Latino"]
-
-Race = ["Select an option",
-        "African",
-        "Asian",
-        "European",
-        "Native American",
-        "Oceanic"]
+             "Hispanic",
+             "Latino",
+             "Caribbean"]
 
 Gender = ["Select an option",
-          "F",
-          "M"]
+          "Female",
+          "Male",
+          "Neutral"]
 
 BodyParts = ["Select an option",
              "Head",
@@ -47,10 +44,11 @@ SkinColor = ["Select an option",
              "Type I",
              "Type II",
              "Type III",
-             "Type VI",
+             "Type IV",
              "Type V",
              "Type VI"]
 # endregion
+
 
 def isAgeValid(age):
     return MIN_AGE < age < MAX_AGE

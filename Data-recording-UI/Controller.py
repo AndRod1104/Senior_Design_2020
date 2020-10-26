@@ -60,7 +60,7 @@ class LoginPage(tk.Frame):
         welcome_label.pack(pady=10, padx=10)
 
         # Picture for paws up
-        paws_up_image = ImageTk.PhotoImage(Image.open("./images/pawsUpImage.gif"))
+        paws_up_image = ImageTk.PhotoImage(Image.open("./images/PathsUp.gif"))
         paws_up_image_label = tk.Label(self, image=paws_up_image)
         paws_up_image_label.image = paws_up_image
         paws_up_image_label.pack()
@@ -249,6 +249,8 @@ class LogPatient(tk.Frame):
         weight_label.grid(row=8, column=0, padx=10, pady=10)
         weight_entry = ttk.Entry(self)
         weight_entry.grid(row=8, column=1)
+        weight_label_unit = ttk.Label(self, text="Lb", font=SMALL_FONT)
+        weight_label_unit.grid(row=8, column=2, padx=10, pady=10)
 
         height_label = ttk.Label(self, text="Height:", font=SMALL_FONT)
         height_label.grid(row=10, column=0, padx=10, pady=10)
@@ -263,7 +265,7 @@ class LogPatient(tk.Frame):
         ethnicity_options.grid(row=12, column=1)
 
 
-        skin_color_label = ttk.Label(self, text="Skin Color:", font=SMALL_FONT)
+        skin_color_label = ttk.Label(self, text="Fitzpatrick Scale:", font=SMALL_FONT)
         skin_color_label.grid(row=16, column=0, padx=10, pady=10)
         self.skin_color_type = tk.StringVar()
         self.skin_color_type.set(hm.SkinColor[0])  # Initial value
@@ -336,6 +338,8 @@ class DataRecording(tk.Frame):
         duration_label.grid(row=5, column=0, padx=0, pady=10)
         duration_entry = ttk.Entry(self)
         duration_entry.grid(row=5, column=1)
+        seconds_label = ttk.Label(self, text="Seconds", font=SMALL_FONT)
+        seconds_label.grid(row=5, column=2, padx=0, pady=10)
 
         body_part_label = ttk.Label(self, text="Body Location:", font=SMALL_FONT)
         body_part_label.grid(row=4, column=0, padx=0, pady=10)
