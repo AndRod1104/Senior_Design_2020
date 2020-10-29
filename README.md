@@ -19,7 +19,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/apast005/QMS">
-    <img src="https://avatars3.githubusercontent.com/u/69246622?s=460&u=db1d7a32b0de4373c355352638a3e7cad9ffa97c&v=4" alt="Logo" width="80" height="80">
+    <img src="Data-recording-UI/images/PathsUp.gif" alt="Logo" width="120" height="120">
   </a>
 
   <h3 align="center">FIUCIS-CDA UNIX Student Project</h3>
