@@ -22,10 +22,10 @@
     <img src="Data-recording-UI/images/PathsUp.gif" alt="Logo" width="150" height="120">
   </a>
 
-  <h3 align="center">FIUCIS-CDA UNIX Student Project</h3>
+  <h3 align="center">Enabling Wearable Technology on Patients with High Body Mass Index</h3>
 
   <p align="center">
-    UNIX project to automate Quartus and ModelSim operations through shell scripting
+    The project aims to provide researchers with a User Interface to control a medical device in development, which keeps measurements of blood pressure and diabetes through the analysis of wavelength and light absorption using a spectrometer. Additionally, the project includes the use of Cloud Computing for Data Analytics from the gathered device data.
     <br />
     <a href="https://github.com/apast005/QMS"><strong>Explore the docs »</strong></a>
     <br />
