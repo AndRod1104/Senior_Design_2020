@@ -8,7 +8,6 @@ import threading
 from PIL import Image, ImageTk
 
 
-
 class Controller(tk.Tk):
 
     def __init__(self, *args, **kwargs):
@@ -287,7 +286,8 @@ class LogPatient(tk.Frame):
                 print(self.gender_option_selected.get())
                 print(self.skin_color_type.get())
                 # move to recording page
-                controller.show_frame(DataRecording)
+                #controller.show_frame(DataRecording)
+                import OO_spec
 
             return
 
