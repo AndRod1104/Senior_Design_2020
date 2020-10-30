@@ -27,7 +27,7 @@
   <p align="center">
     The project aims to provide researchers with a User Interface to control a medical device in development, which keeps measurements of blood pressure and diabetes through the analysis of wavelength and light absorption using a spectrometer. Additionally, the project includes the use of Cloud Computing for Data Analytics from the gathered device data.
     <br />
-    <a href="https://github.com/apast005/QMS"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/CPRGB/Senior_Design_2020.git"><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/apast005/QMS">View Demo</a>
@@ -63,23 +63,10 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-UNIX course project to automate the installation of Intel's Quartus and ModelSim
-for Linux Ubuntu 20.04. Necessary library dependencies for installation are checked
-and installed.  Hardware components downloaded from [FIUSCIS-CDA GitHub](https://github.com/FIUSCIS-CDA?tab=repositories)
-will also download the dependencies for the hardware to operate.  Documentation
-will also be converted to man pages to be more readily accessed by the community.
-
-Any feedback/suggestions to make this project a useful contribution to the open
-source community is greatly appreciated!
-My main goal is to ease the use of Quartus and ModelSim for educational purposes
-and create polished shell scripts for anyone to use.
-
-
-Most of the README will be updated as the project progresses.  The majority is
-still in a template format derived from [this github.](https://github.com/othneildrew/Best-README-Template/blob/master/BLANK_README.md)
+The end goal of this project is to create wearable devices that monitor blood preasure levels and heart rate for overweight population. A user interface (UI) is being developed with different functionalities to facilitate researchers work when logging in patient's information, data recordering. This UI will be running on a Raspberry Pi computer and will allow researchers to start recording sessions and save the gathered data to a database. The data recorded will be processed by an algorithm and displayed on a website accesible by multiple researchers around the world.
 ### Built With
 
-* []()
+* [Python3]()
 * []()
 * []()
 
