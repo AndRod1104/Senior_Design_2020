@@ -1,45 +1,80 @@
+import seatease.spectrometers as s  # Emulator to test w/o spectrometer
+from seatease.cseatease import SeaTeaseAPI
+
 import tkinter as tk
 from datetime import datetime
 from Design import *
 from tkinter import ttk, Entry
 import HelperMethods as hm
+import numpy as np
 from tkinter.messagebox import showerror
 import threading
 from PIL import Image, ImageTk
+import matplotlib
 
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.lines import Line2D
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib import style
+
+style.use("ggplot")
+
+spec = s.Spectrometer.from_first_available()
+dev_list = s.list_devices()  # Part of emulator
+spec = s.Spectrometer(dev_list[0])  # Part of emulator
+IntTime = 20000  # 20 ms, set default integration time to a reasonable value
+spec.integration_time_micros(IntTime)
+x = spec.wavelengths()
+data = spec.intensities()  # correct_dark_counts=True, correct_nonlinearity=False PUT BACK IN ()
+xmin = np.around(min(x), decimals=2)
+xmax = np.around(max(x), decimals=2)
+ymin = np.around(min(data), decimals=2)
+ymax = np.around(max(data), decimals=2)
+
+
+# minIntTime =spec.minimum_integration_time_micros          UNCOMMENT
 
 class Controller(tk.Tk):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, ax=None, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
         tk.Tk.wm_title(self, "Data Recording")
 
-        self.geometry("400x650")
+        self.geometry("1000x700")
 
         # region Design
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
-        #endregion
+        # endregion
 
-        #region Frames
+        # region Frames
         # Dictionary of class names, frames (Ex: HomePage, actual frame)
         self.frames = {}
 
         # Adds pages to the container
         for frame in (LoginPage, LogPatient, DataRecording, SignUp, ResetPW):
+            if frame is DataRecording:
+                print("I am DataRecording")
+                tempFrame = frame(container, self, ax)
+                self.frames[frame] = tempFrame
 
+                tempFrame.grid(row=0, column=0, sticky="nsew")
             # Initialize frames and save them into frames
-            tempFrame = frame(container, self)
-            self.frames[frame] = tempFrame
+            else:
+                print("I am the rest frames")
+                tempFrame = frame(container, self)
+                self.frames[frame] = tempFrame
 
-            tempFrame.grid(row=0, column=0, sticky="nsew")
+                tempFrame.grid(row=0, column=0, sticky="nsew")
 
         # Starting page
         self.show_frame(LoginPage)
-        #endregion
+        # endregion
 
     # When called, passes the frame or page to be showed on windows
     def show_frame(self, cont):
@@ -49,61 +84,56 @@ class Controller(tk.Tk):
 
 class LoginPage(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, ax=None):
         tk.Frame.__init__(self, parent)
 
-        password_bullets = "\u2022" # Bullet points for password security
+        password_bullets = "\u2022"  # Bullet points for password security
 
         # region Design
         welcome_label = ttk.Label(self, text="Welcome to the BMI reading Platform", font=LARGE_FONT)
         welcome_label.pack(pady=10, padx=10)
 
-        # Picture for paws up
-        paws_up_image = ImageTk.PhotoImage(Image.open("./images/PathsUp.gif"))
+        # Picture for paths up
+        paws_up_image = ImageTk.PhotoImage(Image.open("./images/PathsUp.gif"), master=self)
         paws_up_image_label = tk.Label(self, image=paws_up_image)
         paws_up_image_label.image = paws_up_image
         paws_up_image_label.pack()
-        
+
         # Email Label and entry box
         email_label = ttk.Label(self, text="Email *", font=SMALL_FONT)
         email_label.pack(pady=10, padx=10)
         email_entry = ttk.Entry(self)
+        email_entry.insert(0, "test@yahoo.com")  # 2TEST ERASE!!!
         email_entry.pack()
 
         # Password label and entry box
         password_label = ttk.Label(self, text="Password *", font=SMALL_FONT)
         password_label.pack(pady=10, padx=10)
         password_entry = ttk.Entry(self, show=password_bullets)
+        password_entry.insert(0, "badbunny")  # 2TEST ERASE!!!
         password_entry.pack()
 
-        #region Buttons
-
-        # Login
+        # Login Button
         log_in_button = ttk.Button(self, text="Log In", command=lambda: check_credentials())
         log_in_button.pack(pady=10)
 
-        # Signup
+        # Signup Button
         sign_up_button = ttk.Button(self, text="Sign Up", command=lambda: controller.show_frame(SignUp))
         sign_up_button.pack()
 
-        # Forgot Password 
-        forgot_password_button = ttk.Button(self, text="Forgot Password", command=lambda: controller.show_frame(ResetPW))
+        # Forgot Password Button
+        forgot_password_button = ttk.Button(self, text="Forgot Password",
+                                            command=lambda: controller.show_frame(ResetPW))
         forgot_password_button.pack(pady=20, padx=10)
-        # endregion
 
         # endregion
 
-        # region Methods
         def check_credentials():
-
             if hm.check_fields_inputs(
                     emailEntry=email_entry,
                     passwordEntry=password_entry,
                     checkEmailFormat=email_entry.get()):
-
                 controller.show_frame(LogPatient)
-
-        # endregion
 
 
 class SignUp(tk.Frame):
@@ -113,54 +143,55 @@ class SignUp(tk.Frame):
     email = ""
     institution = ""
 
-
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, ax=None):
         tk.Frame.__init__(self, parent)
 
         # region Design
         welcome_label = ttk.Label(self, text="New Researcher", font=LARGE_FONT)
-        welcome_label.grid(row=0, column=1, pady=10)
+        welcome_label.pack(pady=10)
 
         f_name_label = ttk.Label(self, text="First Name *", font=SMALL_FONT)
-        f_name_label.grid(row=2, column=0, padx=0, pady=10)
+        f_name_label.pack(pady=10)
         f_name_entry = ttk.Entry(self)
-        f_name_entry.grid(row=2, column=1)
+        f_name_entry.pack()
 
         m_initial_label = ttk.Label(self, text="Middle Initial *", font=SMALL_FONT)
-        m_initial_label.grid(row=4, column=0, padx=10, pady=10)
+        m_initial_label.pack(pady=10)
         middle_initial_entry = ttk.Entry(self)
-        middle_initial_entry.grid(row=4, column=1)
+        middle_initial_entry.pack()
 
         l_name_label = ttk.Label(self, text="Last Name *", font=SMALL_FONT)
-        l_name_label.grid(row=8, column=0, padx=10, pady=10)
+        l_name_label.pack(pady=10)
         l_name_entry = ttk.Entry(self)
-        l_name_entry.grid(row=8, column=1)
+        l_name_entry.pack()
 
         email_label = ttk.Label(self, text="Email *", font=SMALL_FONT)
-        email_label.grid(row=10, column=0, padx=10, pady=10)
+        email_label.pack(pady=10)
         email_entry = ttk.Entry(self)
-        email_entry.grid(row=10, column=1)
+        email_entry.pack()
 
         inst_label = ttk.Label(self, text="Institution *", font=SMALL_FONT)
-        inst_label.grid(row=12, column=0, padx=10, pady=10)
+        inst_label.pack(pady=10)
         inst_entry = ttk.Entry(self)
-        inst_entry.grid(row=12, column=1)
+        inst_entry.pack()
 
         password_label = ttk.Label(self, text="Password *", font=SMALL_FONT)
-        password_label.grid(row=14, column=0, pady=10)
+        password_label.pack(pady=10)
         password_entry = ttk.Entry(self, show="*")
-        password_entry.grid(row=14, column=1, pady=10)
+        password_entry.pack()
 
         retype_password_label = ttk.Label(self, text="Retype password *", font=SMALL_FONT)
-        retype_password_label.grid(row=16, column=0, pady=10)
+        retype_password_label.pack(pady=10)
         retype_password_entry = ttk.Entry(self, show="*")
-        retype_password_entry.grid(row=16, column=1, pady=10)
+        retype_password_entry.pack()
 
         sign_up_button = ttk.Button(self, text="Sign Up", command=lambda: signUp())
-        sign_up_button.grid(row=18, column=1, pady=10)
+        sign_up_button.pack(pady=10)
 
-        alreadyHaveAnAccount = ttk.Button(self, text="Already have an Account? Login", command=lambda: controller.show_frame(LoginPage))
-        alreadyHaveAnAccount.grid(row=20, column=1)
+        alreadyHaveAnAccount = ttk.Button(self, text="Already have an Account? Login",
+                                          command=lambda: controller.show_frame(LoginPage))
+        alreadyHaveAnAccount.pack()
+
         # endregion
 
         # region Methods
@@ -175,7 +206,7 @@ class SignUp(tk.Frame):
                     reEnterPasswordEntry=retype_password_entry,
                     emailEntry=email_entry,
                     checkEmailFormat=email_entry.get(),
-                    ):
+            ):
                 get_values()
                 print(self.first_name)
                 print(self.middle_Initial)
@@ -188,13 +219,12 @@ class SignUp(tk.Frame):
             self.last_name = l_name_entry.get()
             self.email = email_entry.get()
             self.institution = inst_entry.get()
-
         # endregion
 
 
 class ResetPW(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, ax=None):
         tk.Frame.__init__(self, parent)
 
         # region Design
@@ -208,6 +238,7 @@ class ResetPW(tk.Frame):
 
         send_button = ttk.Button(self, text="Send password reset", command=lambda: controller.show_frame(LoginPage))
         send_button.pack(pady=30, padx=10)
+        # endregion
 
 
 class LogPatient(tk.Frame):
@@ -220,7 +251,7 @@ class LogPatient(tk.Frame):
     gender_option_selected = ""
     duration_value = 0
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, ax=None):
         tk.Frame.__init__(self, parent)
 
         # region Design
@@ -229,12 +260,13 @@ class LogPatient(tk.Frame):
 
         id_label = ttk.Label(self, text="Patient ID:", font=SMALL_FONT)
         id_label.grid(row=2, column=0, padx=0, pady=10)
-        id_val = ttk.Label(self, text="001", font=SMALL_FONT)      # Interactive get subjID from DB
+        id_val = ttk.Label(self, text="001", font=SMALL_FONT)  # Interactive get subjID from DB
         id_val.grid(row=2, column=1)
 
         age_label = ttk.Label(self, text="Age:", font=SMALL_FONT)
         age_label.grid(row=4, column=0, padx=10, pady=10)
         age_entry = ttk.Entry(self)
+        age_entry.insert(0, 30)  # 2TEST ERASE!!!
         age_entry.grid(row=4, column=1)
 
         gender_label = ttk.Label(self, text="Sex:", font=SMALL_FONT)
@@ -243,10 +275,12 @@ class LogPatient(tk.Frame):
         self.gender_option_selected.set(hm.Gender[0])  # Initial value
         gender_options = ttk.OptionMenu(self, self.gender_option_selected, *hm.Gender)
         gender_options.grid(row=6, column=1)
+        print(f'This is gender first value: {self.gender_option_selected}')
 
         weight_label = ttk.Label(self, text="Weight:", font=SMALL_FONT)
         weight_label.grid(row=8, column=0, padx=10, pady=10)
         weight_entry = ttk.Entry(self)
+        weight_entry.insert(0, 130)  # 2TEST ERASE!!!
         weight_entry.grid(row=8, column=1)
         weight_label_unit = ttk.Label(self, text="Lb", font=SMALL_FONT)
         weight_label_unit.grid(row=8, column=2, padx=10, pady=10)
@@ -254,6 +288,7 @@ class LogPatient(tk.Frame):
         height_label = ttk.Label(self, text="Height:", font=SMALL_FONT)
         height_label.grid(row=10, column=0, padx=10, pady=10)
         height_entry = ttk.Entry(self)
+        height_entry.insert(0, 5.1)  # 2TEST ERASE!!!
         height_entry.grid(row=10, column=1)
 
         ethnicity_label = ttk.Label(self, text="Ethnicity:", font=SMALL_FONT)
@@ -262,7 +297,6 @@ class LogPatient(tk.Frame):
         self.ethnicity_option_selected.set(hm.Ethnicity[0])  # Initial value
         ethnicity_options = ttk.OptionMenu(self, self.ethnicity_option_selected, *hm.Ethnicity)
         ethnicity_options.grid(row=12, column=1)
-
 
         skin_color_label = ttk.Label(self, text="Fitzpatrick Scale:", font=SMALL_FONT)
         skin_color_label.grid(row=16, column=0, padx=10, pady=10)
@@ -273,8 +307,9 @@ class LogPatient(tk.Frame):
 
         save_button = ttk.Button(self, text="Save and Continue", command=lambda: save_and_go_to_recording_page())
         save_button.grid(row=26, column=1, padx=10, pady=30)
+
         # endregion
-        
+
         # region methods
         def save_and_go_to_recording_page():
 
@@ -286,8 +321,7 @@ class LogPatient(tk.Frame):
                 print(self.gender_option_selected.get())
                 print(self.skin_color_type.get())
                 # move to recording page
-                #controller.show_frame(DataRecording)
-                import OO_spec
+                controller.show_frame(DataRecording)
 
             return
 
@@ -318,36 +352,113 @@ class DataRecording(tk.Frame):
 
     # stopwatch
     running = False
-    current_ticking_value = 18000   # This depends on current timezone, may be different in other regions. Starts at 0
-    ticking_value_max = 0   # initialization, actual value assigned on create_stopwatch() function
+    current_ticking_value = 18000  # This depends on current timezone, may be different in other regions. Starts at 0
+    ticking_value_max = 0  # initialization, actual value assigned on create_stopwatch() function
     timer_label = ""
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, ax=None):
+        global data, x
+        global IntTime, Averages
+        global xmin, xmax, ymin, ymax
+        global monitorwave, monitorindex, monitor
+
+        self.ax = ax
+        self.x = x
+        self.xmin = xmin
+        self.xmax = xmax
+        self.ymin = ymin
+        self.ymax = ymax
+        self.data = data
+        self.line = Line2D(self.x, self.data, color='red')
+        self.ax.add_line(self.line)
+        self.ax.set_ylim(ymin * 0.8, ymax * 1.1)
+        self.ax.set_xlim(self.xmin, self.xmax)
+        monitorwave = np.median(x)
+
         tk.Frame.__init__(self, parent)
-
+        print(f'AX: {ax}')  # ERASE
         # region Design
-        label = ttk.Label(self, text="Session Recording", font=LARGE_FONT)
-        label.grid(row=0, column=1, padx=0, pady=10)
+        label = ttk.Label(self, text=f"Session Recording: {ax}", font=LARGE_FONT)
+        label.pack(side='top', pady=20)
 
-        id_label = ttk.Label(self, text="Patient ID:", font=SMALL_FONT)
-        id_label.grid(row=2, column=0, padx=0, pady=10)
-        id_val = ttk.Label(self, text="001", font=SMALL_FONT)      # Interactive get subjID from DB
-        id_val.grid(row=2, column=1)
+        # This frame1 packs all the labels on the first column on the UI
+        self.frame1 = tk.Frame(self)
+        self.frame1.pack(side='left', anchor=tk.N)
 
-        duration_label = ttk.Label(self, text="Duration:", font=SMALL_FONT)
-        duration_label.grid(row=5, column=0, padx=0, pady=10)
-        duration_entry = ttk.Entry(self)
-        duration_entry.grid(row=5, column=1)
-        seconds_label = ttk.Label(self, text="Seconds", font=SMALL_FONT)
-        seconds_label.grid(row=5, column=2, padx=0, pady=10)
+        # This frame1 packs all the labels on the second column on the UI
+        self.frame2 = tk.Frame(self)
+        self.frame2.pack(side='left', anchor=tk.N)
 
-        body_part_label = ttk.Label(self, text="Body Location:", font=SMALL_FONT)
-        body_part_label.grid(row=4, column=0, padx=0, pady=10)
+        # This frame1 packs all the labels on the third column on the UI
+        self.frame3 = tk.Frame(self)
+        self.frame3.pack(side='left', anchor=tk.N)
+
+        id_label = tk.Label(self.frame1, text="Patient ID:", font=SMALL_FONT)
+        id_label.pack(side='top', pady=4)
+        id_val = tk.Label(self.frame2, text="001", font=SMALL_FONT)  # Interactive get subjID from DB
+        id_val.pack(side='top', pady=4)
+        filler_label = tk.Label(self.frame3, text="")
+        filler_label.pack(side='top', pady=4)
+
+        # Integration time design
+        duration_label = tk.Label(self.frame1, text="Integration Time:", font=SMALL_FONT)
+        duration_label.pack(side='top', pady=4)
+        self.duration_entry = tk.Entry(self.frame2, width='6', justify='right')
+        self.duration_entry.pack(side='top', pady=4, anchor=tk.N)
+        seconds_label = tk.Label(self.frame3, text="Seconds", font=SMALL_FONT)
+        seconds_label.pack(side='top', pady=4)
+        # self.seconds_label.bind('<Return>', self.EntryInt_return
+
+        # Amount of spectra to average design
+        spec_avg_label = tk.Label(self.frame1, text='Amount of spectra to average', width='20', wraplength='150',
+                                  font=SMALL_FONT)
+        spec_avg_label.pack(side='top', pady=4)
+        self.spec_avg_entry = tk.Entry(self.frame2, width='4', justify='right')
+        self.spec_avg_entry.pack(side='top', pady=2)
+        # self.spec_avg_entry.bind('<Return>', self.EntryAvg_return)
+
+        # Minimum wavelength label and entry field
+        labelxmin = tk.Label(self.frame1, text='Minimum wavelength', font=SMALL_FONT)
+        labelxmin.pack(side='top', pady=2)
+        self.entryxmin = tk.Entry(self.frame2, width='7')
+        self.entryxmin.pack(side='top', pady=2)
+        # self.entryxmin.insert(0, xmin)             AUTOINPUTS VALUE
+        # self.entryxmin.bind('<Return>', self.Entryxmin_return)
+
+        # Maximum wavelength label and entry field
+        labelxmax = tk.Label(self.frame1, text='Maximum wavelength', font=SMALL_FONT)
+        labelxmax.pack(side='top', pady=2)
+        self.entryxmax = tk.Entry(self.frame2, width='7')
+        self.entryxmax.pack(side='top', pady=2)
+        # self.entryxmax.insert(0, xmax)             AUTOINPUTS VALUE
+        # self.entryxmax.bind('<Return>', self.Entryxmax_return)
+
+        body_part_label = tk.Label(self.frame1, text="Body Location:", font=SMALL_FONT)
+        body_part_label.pack(side='top', pady=4)
         self.body_part_option_selected = tk.StringVar()
         self.body_part_option_selected.set(hm.BodyParts[0])  # Initial Value
-        body_part_options = ttk.OptionMenu(self, self.body_part_option_selected, *hm.BodyParts)
-        body_part_options.grid(row=4, column=1, padx=0, pady=10)
+        body_part_options = ttk.OptionMenu(self.frame2, self.body_part_option_selected, *hm.BodyParts)
+        body_part_options.pack(side='top', pady=4)
 
+        log_out_button = tk.Button(self.frame1, text="Log out", command=lambda: controller.show_frame(LoginPage))
+        log_out_button.pack(side='top', pady=10)
+
+        # Labels for the graph
+        ax.set_xlabel('Wavelength (nm)')
+        ax.set_ylabel('Counts')
+
+        # Creates the design for the graph
+        canvas = FigureCanvasTkAgg(fig, self)
+        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+        # Blue line in on the graph
+        monitorindex = np.searchsorted(x, monitorwave, side='left')
+        monitor = np.round(self.data[monitorindex], decimals=3)
+        self.text = self.ax.text(0.9, 0.9, monitor, transform=ax.transAxes, fontsize=14)
+        self.ax.axvline(x=monitorwave, lw=2, color='blue', alpha=0.5)
+
+
+"""
         btn_start_stop = ttk.Button(self, text="Start", command=lambda: start_stop_process())
         btn_start_stop.grid(row=8, column=0, padx=0, pady=10)
 
@@ -505,7 +616,7 @@ class DataRecording(tk.Frame):
             # Triggering the start of the counter.
             count()
         # endregion
-
-
-app = Controller()
+"""
+fig, ax = plt.subplots()
+app = Controller(ax)
 app.mainloop()
