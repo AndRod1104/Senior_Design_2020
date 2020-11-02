@@ -31,9 +31,9 @@ ymax = np.around(max(data), decimals=2)
 # minIntTime =spec.minimum_integration_time_micros          UNCOMMENT
 
 
-class Controller(tk.Tk):
 
-    def __init__(self, ax=None, *args, **kwargs):
+class Controller(tk.Tk):
+    def __init__(self, ax, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
         tk.Tk.wm_title(self, "Data Recording")
@@ -71,6 +71,9 @@ class Controller(tk.Tk):
         self.show_frame(LoginPage)
         # endregion
 
+    def get_DataRecording(self):
+        return self.all_frames[DataRecording]   # DataRecording frame
+
     # When called, passes the frame or page to be showed on windows
     def show_frame(self, cont):
         frame = self.frames[cont]
@@ -79,7 +82,7 @@ class Controller(tk.Tk):
 
 class LoginPage(tk.Frame):
 
-    def __init__(self, parent, controller, ax=None):
+    def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
         password_bullets = "\u2022"  # Bullet points for password security
@@ -138,7 +141,7 @@ class SignUp(tk.Frame):
     email = ""
     institution = ""
 
-    def __init__(self, parent, controller, ax=None):
+    def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
         # region Design
@@ -219,7 +222,7 @@ class SignUp(tk.Frame):
 
 class ResetPW(tk.Frame):
 
-    def __init__(self, parent, controller, ax=None):
+    def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
         # region Design
@@ -246,7 +249,7 @@ class LogPatient(tk.Frame):
     gender_option_selected = ""
     duration_value = 0
 
-    def __init__(self, parent, controller, ax=None):
+    def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
         # region Design
@@ -351,12 +354,15 @@ class DataRecording(tk.Frame):
     ticking_value_max = 0  # initialization, actual value assigned on create_stopwatch() function
     timer_label = ""
 
+    dark = np.zeros(len(x))
+    incident = np.ones(len(x))  # dummy values to prevent error in Absorbance when no dark recorded
+    AbMode = 0  # start in raw intensity mode
+
     def __init__(self, parent, controller, ax=None):
         global data, x
         global IntTime, Averages
         global xmin, xmax, ymin, ymax
         global monitorwave, monitorindex, monitor
-
         self.ax = ax
         self.x = x
         self.xmin = xmin
@@ -369,6 +375,7 @@ class DataRecording(tk.Frame):
         self.ax.set_ylim(ymin * 0.8, ymax * 1.1)
         self.ax.set_xlim(self.xmin, self.xmax)
         monitorwave = np.median(x)
+
 
         tk.Frame.__init__(self, parent)
         print(f'AX: {ax}')  # ERASE
@@ -605,7 +612,7 @@ class DataRecording(tk.Frame):
                     btn_pause_resume["text"] = "Pause"
             # Triggering the start of the counter.
             count()
-
+        #endregion
 
     ############ NEW METHODS ##############
     def setconfig(self):
@@ -718,7 +725,26 @@ class DataRecording(tk.Frame):
             self.entrymonitor.delete(0, 'end')
             self.entrymonitor.insert(0, monitorwave)
 
+    def update(self, data):
+
+        self.data = spec.intensities()
+
+        if self.AbMode==1:
+            self.data = np.array(self.data, dtype=float)
+            self.data = np.log10((self.incident-self.dark)/(self.data-self.dark))
+            self.line.set_data(self.x, self.data)
+            monitor = np.round(self.data[monitorindex], decimals=3)
+            self.text.set_text(monitor)
+            return self.line,
+
+        else:
+            #y-axis handled by reset button
+            self.line.set_data(self.x, self.data)
+            monitor = np.round(self.data[monitorindex], decimals=3)
+            self.text.set_text(monitor)
+            return self.line,
 
 fig, ax = plt.subplots()
 app = Controller(ax)
+ani = animation.FuncAnimation(fig, app.frames[DataRecording].update, interval=10, blit=False)
 app.mainloop()
