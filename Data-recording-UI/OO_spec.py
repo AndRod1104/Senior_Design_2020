@@ -29,7 +29,7 @@ spec = sb.Spectrometer.from_serial_number()
 IntTime = 20000  #20 ms, set default integration time to a reasonable value
 spec.integration_time_micros(IntTime)
 x = spec.wavelengths()
-data = spec.intensities(correct_dark_counts=False, correct_nonlinearity=False)
+data = spec.intensities()                                   # correct_dark_counts=False, correct_nonlinearity=False
 xmin = np.around(min(x), decimals=2)
 xmax = np.around(max(x), decimals=2)
 ymin = np.around(min(data), decimals=2)
