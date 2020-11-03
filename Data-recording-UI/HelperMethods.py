@@ -138,7 +138,7 @@ def check_fields_inputs(ageEntry=None, heightEntry=None, weightEntry=None, durat
 
     if durationEntry is not None:
         try:
-            durationValue = int(durationEntry.get())
+            durationValue = float(durationEntry.get())
 
             # This was moved here, because there is no need to print this error if above already failed
             if not isDurationValid(durationValue):

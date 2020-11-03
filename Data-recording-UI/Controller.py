@@ -8,7 +8,7 @@ from LogPatient import *
 import tkinter as tk
 from datetime import datetime
 from Design import *
-from tkinter import ttk, Entry
+from tkinter import ttk
 import HelperMethods as hm
 import numpy as np
 from tkinter.messagebox import showerror
@@ -44,21 +44,21 @@ class Controller(tk.Tk):
 
         self.geometry("1000x700")
 
-
-        #region Frames
+        # region Frames
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
         # Dictionary of class names, frames (Ex: HomePage, actual frame)
-        self.frames = {"LoginPage": LoginPage(container, self)}     # Initialize dictionary with LoginPage
-        self.frames["LoginPage"].grid(row=0, column=0, sticky="nsew")
+        self.frames = {"LoginPage": LoginPage(container, self),
+                       "LogPatient": LogPatient(container, self),
+                       "DataRecording": DataRecording(container, self, ax),
+                       "SignUp": SignUp(container, self),
+                       "ResetPW": ResetPW(container, self)}
 
-        self.frames["LogPatient"] = LogPatient(container, self)
-        self.frames["DataRecording"] = DataRecording(container, self, ax)
-        self.frames["SignUp"] = SignUp(container, self)
-        self.frames["ResetPW"] = ResetPW(container, self)
+        for frame in self.frames:
+            self.frames[frame].grid(row=0, column=0, sticky="nsew")
 
         # Starting page
         self.show_login_frame()
@@ -68,7 +68,6 @@ class Controller(tk.Tk):
     def show_login_frame(self):
         frame = self.frames["LoginPage"]
         frame.tkraise()
-
 
     def show_patientLog_frame(self):
         frame = self.frames["LogPatient"]
@@ -85,12 +84,13 @@ class Controller(tk.Tk):
     def show_resetPW_frame(self):
         frame = self.frames["ResetPW"]
         frame.tkraise()
-    #endregion
+    # endregion
 
 
 class DataRecording(tk.Frame):
     body_part_option_selected = ""
-    duration_value = 0
+    duration_value = 0.0
+    session_interrupt = -1
 
     # stopwatch
     running = False
@@ -162,16 +162,16 @@ class DataRecording(tk.Frame):
         self.spec_avg_entry.bind('<Return>', self.validate_spec_avg)
 
         # Minimum wavelength label and entry field
-        labelxmin = tk.Label(self.frame1, text='Minimum wavelength', font=SMALL_FONT)
-        labelxmin.pack(side='top', pady=2)
-        self.entryxmin = tk.Entry(self.frame2, width='7', justify='right')
-        self.entryxmin.pack(side='top', pady=2)
-        self.entryxmin.insert(0, xmin)                                           # AUTO INPUTS VALUE
-        self.entryxmin.bind('<Return>', self.validate_xmin)
+        xmin_label = tk.Label(self.frame1, text='Minimum wavelength', font=SMALL_FONT)
+        xmin_label.pack(side='top', pady=2)
+        self.xmin_entry = tk.Entry(self.frame2, width='7', justify='right')
+        self.xmin_entry.pack(side='top', pady=2)
+        self.xmin_entry.insert(0, xmin)                                           # AUTO INPUTS VALUE
+        self.xmin_entry.bind('<Return>', self.validate_xmin)
 
         # Maximum wavelength label and entry field
-        labelxmax = tk.Label(self.frame1, text='Maximum wavelength', height='2', font=SMALL_FONT)
-        labelxmax.pack(side='top', pady=2)
+        xmax_label = tk.Label(self.frame1, text='Maximum wavelength', height='2', font=SMALL_FONT)
+        xmax_label.pack(side='top', pady=2)
         self.entryxmax = tk.Entry(self.frame2, width='7', justify='right')
         self.entryxmax.pack(side='top', pady=2)
         self.entryxmax.insert(0, xmax)                                          # AUTO INPUTS VALUE
@@ -200,8 +200,7 @@ class DataRecording(tk.Frame):
         log_out_button = tk.Button(self.frame1, text="Log out", command=lambda: controller.show_login_frame())
         log_out_button.pack(side='bottom', pady=10)
 
-        checkbox_value = tk.IntVar()
-        check_box_label = tk.Checkbutton(self.frame1, text="Interrupted session", variable=checkbox_value)
+        check_box_label = tk.Checkbutton(self.frame1, text="Interrupted session", command=lambda: box_toggled())
         check_box_label.pack(side='bottom', pady=10)
         # endregion
 
@@ -222,19 +221,21 @@ class DataRecording(tk.Frame):
         self.text = self.ax.text(0.9, 0.9, monitor, transform=ax.transAxes, fontsize=14)
         self.ax.axvline(x=monitor_wave, lw=2, color='blue', alpha=0.5)
 
-        def save_recording():
-            if checkbox_value.get() == 1:    # If interrupted session
+        # This method changes a value when checkBox is checked meaning a session was interrupted
+        def box_toggled():
+            self.session_interrupt *= -1
 
+        def save_recording():
+            if self.session_interrupt == -1:
+                print("Normal session")
+            else:
                 # TODO: Message box will probably have to be a customized pop-up. You can't add an entry text field here
                 result = tk.messagebox.askyesno("Interrupted session", "You have marked this session as interrupted.\n"
                                                                        "Data will be saved in different database")
-                if result:     # If user confirmed session was interrupted and he/she agrees with message
+                if result:  # If user confirmed session was interrupted and he/she agrees with message
                     # TODO: Data in different database
                     print("Result:")
                     print(result)
-
-            else:   # normal session
-                print("Normal session")
 
             return
 
@@ -308,7 +309,7 @@ class DataRecording(tk.Frame):
             if hm.check_fields_inputs(durationEntry=self.duration_entry,
                                       bodyPartOption=self.body_part_option_selected.get()):
 
-                self.duration_value = int(self.duration_entry.get())
+                self.duration_value = float(self.duration_entry.get())
                 return True
 
             else:
@@ -432,24 +433,24 @@ class DataRecording(tk.Frame):
         """ Validates min wavelength to show in graph """
 
         global xmin
-        xmin_temp = self.entryxmin.get()
+        xmin_temp = self.xmin_entry.get()
         try:
             float(xmin_temp)
-            xmin_temp = float(self.entryxmin.get())
+            xmin_temp = float(self.xmin_entry.get())
             if xmin_temp < xmax:
                 xmin = xmin_temp
-                self.entryxmin.delete(0, 'end')
-                self.entryxmin.insert(0, xmin)  # set text in box
+                self.xmin_entry.delete(0, 'end')
+                self.xmin_entry.insert(0, xmin)  # set text in box
                 self.ax.set_xlim(xmin, xmax)
             else:
                 msg = "Minimum wavelength must be smaller than maximum wavelength.  You entered " + str(
                     xmin_temp) + " nm."
-                self.entryxmin.delete(0, 'end')
-                self.entryxmin.insert(0, xmin)  # set text in box
+                self.xmin_entry.delete(0, 'end')
+                self.xmin_entry.insert(0, xmin)  # set text in box
                 #popupmsg(msg)
         except:
-            self.entryxmin.delete(0, 'end')
-            self.entryxmin.insert(0, xmin)  # set text in box to unchanged value
+            self.xmin_entry.delete(0, 'end')
+            self.xmin_entry.insert(0, xmin)  # set text in box to unchanged value
 
     def update(self, data):
         """ This function manages the update of the
