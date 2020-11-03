@@ -25,8 +25,9 @@ style.use("ggplot")
 spec = s.Spectrometer.from_first_available()
 dev_list = s.list_devices()  # Part of emulator
 spec = s.Spectrometer(dev_list[0])  # Part of emulator
-IntTime = 20000  # 20 ms, set default integration time to a reasonable value
-spec.integration_time_micros(IntTime)
+integration_time = 20000  # 20 ms, set default integration time to a reasonable value
+spectra_average = 1
+spec.integration_time_micros(integration_time)
 x = spec.wavelengths()
 data = spec.intensities()  # correct_dark_counts=True, correct_nonlinearity=False PUT BACK IN ()
 xmin = np.around(min(x), decimals=2)
@@ -107,15 +108,14 @@ class DataRecording(tk.Frame):
     ticking_value_max = 0  # initialization, actual value assigned on create_stopwatch() function
     timer_label = ""
 
-    dark = np.zeros(len(x))
-    incident = np.ones(len(x))  # dummy values to prevent error in Absorbance when no dark recorded
     AbMode = 0  # start in raw intensity mode
 
     def __init__(self, parent, controller, ax):
         global data, x
-        global IntTime, Averages
+        global integration_time, spectra_average
         global xmin, xmax, ymin, ymax
-        global monitorwave, monitorindex, monitor
+        global monitor_wave, monitor_index, monitor
+
         self.ax = ax
         self.x = x
         self.xmin = xmin
@@ -127,13 +127,12 @@ class DataRecording(tk.Frame):
         self.ax.add_line(self.line)
         self.ax.set_ylim(ymin * 0.8, ymax * 1.1)
         self.ax.set_xlim(self.xmin, self.xmax)
-        monitorwave = np.median(x)
-
+        monitor_wave = np.median(x)
 
         tk.Frame.__init__(self, parent)
-        print(f'AX: {ax}')  # ERASE
+
         # region Design
-        label = ttk.Label(self, text=f"Session Recording: {ax}", font=LARGE_FONT)
+        label = ttk.Label(self, text=f"Session Recording", font=LARGE_FONT)
         label.pack(side='top', pady=20)
 
         # This frame1 packs all the labels on the first column on the UI
@@ -150,43 +149,43 @@ class DataRecording(tk.Frame):
 
         id_label = tk.Label(self.frame1, text="Patient ID:", font=SMALL_FONT)
         id_label.pack(side='top', pady=4)
-        id_val = tk.Label(self.frame2, text="001", font=SMALL_FONT)  # Interactive get subjID from DB
+        id_val = tk.Label(self.frame2, text="001", font=SMALL_FONT)                 # Interactive get subjID from DB
         id_val.pack(side='top', pady=4)
         filler_label = tk.Label(self.frame3, text="")
         filler_label.pack(side='top')
 
         # Integration time design
-        duration_label = tk.Label(self.frame1, text="Integration Time:", font=SMALL_FONT)
+        duration_label = tk.Label(self.frame1, text="Integration Time", font=SMALL_FONT)
         duration_label.pack(side='top', pady=4)
-        duration_entry = tk.Entry(self.frame2, width='6', justify='right')
-        duration_entry.pack(side='top', pady=4, anchor=tk.N)
+        self.duration_entry = tk.Entry(self.frame2, width='7', justify='right')
+        self.duration_entry.pack(side='top', pady=4, anchor=tk.N)
         seconds_label = tk.Label(self.frame3, text="Seconds", height='2', font=SMALL_FONT)
         seconds_label.pack(side='top', pady=4)
-        duration_entry.bind('<Return>', self.EntryInt_return)
+        self.duration_entry.bind('<Return>', self.validate_integration_time)
 
         # Amount of spectra to average design
-        spec_avg_label = tk.Label(self.frame1, text='Amount of spectra to average', width='20', wraplength='150',
+        spec_avg_label = tk.Label(self.frame1, text='Amount of Spectra to Average', width='20', wraplength='150',
                                   font=SMALL_FONT)
         spec_avg_label.pack(side='top', pady=4)
-        self.spec_avg_entry = tk.Entry(self.frame2, width='4', justify='right')
+        self.spec_avg_entry = tk.Entry(self.frame2, width='7', justify='right')
         self.spec_avg_entry.pack(side='top', pady=2)
-        self.spec_avg_entry.bind('<Return>', self.EntryAvg_return)
+        self.spec_avg_entry.bind('<Return>', self.validate_spec_avg)
 
         # Minimum wavelength label and entry field
         labelxmin = tk.Label(self.frame1, text='Minimum wavelength', font=SMALL_FONT)
         labelxmin.pack(side='top', pady=2)
-        self.entryxmin = tk.Entry(self.frame2, width='7')
+        self.entryxmin = tk.Entry(self.frame2, width='7', justify='right')
         self.entryxmin.pack(side='top', pady=2)
-        self.entryxmin.insert(0, xmin)                                          #Autoenter value
-        self.entryxmin.bind('<Return>', self.Entryxmin_return)
+        self.entryxmin.insert(0, xmin)                                           # AUTO INPUTS VALUE
+        self.entryxmin.bind('<Return>', self.validate_xmin)
 
         # Maximum wavelength label and entry field
         labelxmax = tk.Label(self.frame1, text='Maximum wavelength', height='2', font=SMALL_FONT)
         labelxmax.pack(side='top', pady=2)
-        self.entryxmax = tk.Entry(self.frame2, width='7')
+        self.entryxmax = tk.Entry(self.frame2, width='7', justify='right')
         self.entryxmax.pack(side='top', pady=2)
-        self.entryxmax.insert(0, xmax)                                        #AUTOINPUTS VALUE
-        self.entryxmax.bind('<Return>', self.Entryxmax_return)
+        self.entryxmax.insert(0, xmax)                                          # AUTO INPUTS VALUE
+        self.entryxmax.bind('<Return>', self.validate_xmax)
 
         body_part_label = tk.Label(self.frame1, text="Body Location:", height='2', font=SMALL_FONT)
         body_part_label.pack(side='top', pady=4)
@@ -228,10 +227,10 @@ class DataRecording(tk.Frame):
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
         # Blue line in on the graph
-        monitorindex = np.searchsorted(x, monitorwave, side='left')
-        monitor = np.round(self.data[monitorindex], decimals=3)
+        monitor_index = np.searchsorted(x, monitor_wave, side='left')
+        monitor = np.round(self.data[monitor_index], decimals=3)
         self.text = self.ax.text(0.9, 0.9, monitor, transform=ax.transAxes, fontsize=14)
-        self.ax.axvline(x=monitorwave, lw=2, color='blue', alpha=0.5)
+        self.ax.axvline(x=monitor_wave, lw=2, color='blue', alpha=0.5)
 
         def save_recording():
             if checkbox_value.get() == 1:    # If interrupted session
@@ -264,7 +263,7 @@ class DataRecording(tk.Frame):
 
             btn_pause_resume["text"] = "Pause"
             start_stopwatch(self.timer_label)
-            hm.disable_fields(body_part_options, duration_entry)
+            hm.disable_fields(body_part_options, self.duration_entry)
 
             #TODO
             # Connect to save again values with different body part in DB
@@ -278,7 +277,7 @@ class DataRecording(tk.Frame):
             # Do we want to change the duration and body part once user pauses? *** BUG ***
             btn_pause_resume["text"] = "Resume"
             self.running = False
-            hm.enable_fields(body_part_options, duration_entry)
+            hm.enable_fields(body_part_options, self.duration_entry)
             return
 
         def start_stop_process():
@@ -291,10 +290,9 @@ class DataRecording(tk.Frame):
 
             return
 
-
         def start_process():
 
-            hm.disable_fields(btn_save, log_out_button, diff_patient_button, body_part_options, duration_entry)
+            hm.disable_fields(btn_save, log_out_button, diff_patient_button, body_part_options, self.duration_entry)
             hm.enable_fields(btn_pause_resume)
             btn_start_stop["text"] = "Stop"
 
@@ -308,7 +306,7 @@ class DataRecording(tk.Frame):
             btn_pause_resume["text"] = "Pause"  # if stop the recording, we need to reset this button (bug)
             btn_start_stop["text"] = "Start"
 
-            hm.enable_fields(btn_save, log_out_button, diff_patient_button, body_part_options, duration_entry)
+            hm.enable_fields(btn_save, log_out_button, diff_patient_button, body_part_options, self.duration_entry)
 
             self.running = False
             self.timer_label.destroy()
@@ -317,9 +315,9 @@ class DataRecording(tk.Frame):
         # checks for any errors, prints them and returns False, otherwise no errors and returns True
         def check_fields():
 
-            if hm.check_fields_inputs(durationEntry=duration_entry, bodyPartOption=self.body_part_option_selected.get()):
+            if hm.check_fields_inputs(durationEntry=self.duration_entry, bodyPartOption=self.body_part_option_selected.get()):
 
-                self.duration_value = int(duration_entry.get())
+                self.duration_value = int(self.duration_entry.get())
                 return True
 
             else:
@@ -365,67 +363,73 @@ class DataRecording(tk.Frame):
                     btn_pause_resume["text"] = "Pause"
             # Triggering the start of the counter.
             count()
-        #endregion
+        # endregion
 
     ############ NEW METHODS ##############
-    def setconfig(self):
-        global IntTime
-        spec.integration_time_micros(IntTime)
-        # write new configuration to dialog
-        self.entryint.delete(0, "end")
-        self.entryint.insert(0, IntTime / 1000)  # write ms, but IntTime is microseconds
-        self.entryavg.delete(0, "end")
-        self.entryavg.insert(0, Averages)  # set text in averages box
+    def set_entry_config(self):
+        """ This function handles new inputs on the text fields and it send values to spectrometer """
 
-    def EntryInt_return(self, event):
-        global IntTime
+        global integration_time
+        spec.integration_time_micros(integration_time)
+        # write new configuration to dialog
+        self.duration_entry.delete(0, "end")
+        self.duration_entry.insert(0, integration_time / 1000)  # write ms, but integration_time is microseconds
+        self.spec_avg_entry.delete(0, "end")
+        self.spec_avg_entry.insert(0, spectra_average)  # set text in averages box
+
+    def validate_integration_time(self, event):
+        """ Update integration time and validates from 4ms to 65000 """
+
+        global integration_time
         # typically OO spectrometers cant read faster than 4 ms
-        IntTimeTemp = self.entryint.get()
-        if IntTimeTemp.isdigit() == True:
-            if int(IntTimeTemp) > 65000:
-                msg = "The integration time must be 65000 ms or smaller.  You set " + (IntTimeTemp)
-                self.setconfig()
+        int_time_temp = self.duration_entry.get()
+        if int_time_temp.isdigit():
+            if int(int_time_temp) > 65000:
+                msg = "The integration time must be 65000 ms or smaller.  You set " + int_time_temp
+                self.set_entry_config()
                 #popupmsg(msg)
-            elif int(IntTimeTemp) < 4:
-                msg = "The integration time must be greater than 4 ms.  You set " + (IntTimeTemp)
-                self.setconfig()
+            elif int(int_time_temp) < 4:
+                msg = "The integration time must be greater than 4 ms.  You set " + int_time_temp
+                self.set_entry_config()
                 #popupmsg(msg)
             else:
-                IntTime = int(IntTimeTemp) * 1000  # convert ms to microseconds
-                self.setconfig()
+                integration_time = int(int_time_temp) * 1000  # convert ms to microseconds
+                self.set_entry_config()
         else:
-            msg = "Integration time must be an integer between 4 and 65000 ms.  You set " + str(IntTimeTemp)
-            self.setconfig()
+            msg = "Integration time must be an integer between 4 and 65000 ms.  You set " + str(int_time_temp)
+            self.set_entry_config()
             #popupmsg(msg)
 
-    def EntryAvg_return(self, event):
+    def validate_spec_avg(self, event):
         ## averaging needs to be implemented here in code
         #  cseabreeze has average working, but python-seabreeze doesn't (2019)
-        global Averages
-        Averages = self.entryavg.get()
-        if Averages.isdigit() == True:
-            Averages = int(float(Averages))
+        global spectra_average
+        spectra_average = self.spec_avg_entry.get()
+        if spectra_average.isdigit():
+            spectra_average = int(float(spectra_average))
         else:
-            msg = "Averages must be an integer.  You tried " + str(Averages) + ".  Setting value to 1."
-            Averages = 1
-            self.entryavg.delete(0, "end")
-            self.entryavg.insert(0, Averages)  # set text in averages box
+            msg = "spectra_average must be an integer.  You tried " + str(spectra_average) + ".  Setting value to 1."
+            spectra_average = 1
+            self.spec_avg_entry.delete(0, "end")
+            self.spec_avg_entry.insert(0, spectra_average)  # set text in averages box
             #popupmsg(msg)
 
-    def Entryxmax_return(self, event):
+    def validate_xmax(self, event):
+        """ Validates max wavelength to show in graph """
+
         global xmax
-        xmaxtemp = self.entryxmax.get()
+        xmax_temp = self.entryxmax.get()
         try:
-            float(xmaxtemp)
-            xmaxtemp = float(self.entryxmax.get())
-            if xmaxtemp > xmin:
-                xmax = xmaxtemp
+            float(xmax_temp)
+            xmax_temp = float(self.entryxmax.get())
+            if xmax_temp > xmin:
+                xmax = xmax_temp
                 self.entryxmax.delete(0, 'end')
                 self.entryxmax.insert(0, xmax)  # set text in box
                 self.ax.set_xlim(xmin, xmax)
             else:
                 msg = "Maximum wavelength must be larger than minimum wavelength.  You entered " + str(
-                    xmaxtemp) + " nm."
+                    xmax_temp) + " nm."
                 self.entryxmax.delete(0, 'end')
                 self.entryxmax.insert(0, xmax)  # set text in box
                 #popupmsg(msg)
@@ -433,20 +437,22 @@ class DataRecording(tk.Frame):
             self.entryxmax.delete(0, 'end')
             self.entryxmax.insert(0, xmax)  # set text in box to unchanged value
 
-    def Entryxmin_return(self, event):
+    def validate_xmin(self, event):
+        """ Validates min wavelength to show in graph """
+
         global xmin
-        xmintemp = self.entryxmin.get()
+        xmin_temp = self.entryxmin.get()
         try:
-            float(xmintemp)
-            xmintemp = float(self.entryxmin.get())
-            if xmintemp < xmax:
-                xmin = xmintemp
+            float(xmin_temp)
+            xmin_temp = float(self.entryxmin.get())
+            if xmin_temp < xmax:
+                xmin = xmin_temp
                 self.entryxmin.delete(0, 'end')
                 self.entryxmin.insert(0, xmin)  # set text in box
                 self.ax.set_xlim(xmin, xmax)
             else:
                 msg = "Minimum wavelength must be smaller than maximum wavelength.  You entered " + str(
-                    xmintemp) + " nm."
+                    xmin_temp) + " nm."
                 self.entryxmin.delete(0, 'end')
                 self.entryxmin.insert(0, xmin)  # set text in box
                 #popupmsg(msg)
@@ -454,48 +460,19 @@ class DataRecording(tk.Frame):
             self.entryxmin.delete(0, 'end')
             self.entryxmin.insert(0, xmin)  # set text in box to unchanged value
 
-    def entrymonitor_return(self, event):
-        global monitorwave, monitorindex, x
-        monitorwavetemp = self.entrymonitor.get()
-        try:
-            float(monitorwavetemp)
-            monitorwavetemp = float(self.entrymonitor.get())
-            if xmin < monitorwavetemp < xmax:
-                monitorwave = monitorwavetemp
-                monitorindex = np.searchsorted(x, monitorwave, side='left')
-                monitorwave = np.around(x[monitorindex], decimals=2)
-                self.entrymonitor.delete(0, 'end')
-                self.entrymonitor.insert(0, monitorwave)
-                self.ax.lines.pop(-1)
-                self.ax.axvline(x=monitorwave, lw=2, color='blue', alpha=0.5)
-            else:
-                msg = "Monitored wavelength must be within the detected range.  Range is " + str(
-                    xmin) + " to " + str(xmax) + " nm."
-                self.entrymonitor.delete(0, 'end')
-                self.entrymonitor.insert(0, monitorwave)
-                #popupmsg(msg)
-        except:
-            self.entrymonitor.delete(0, 'end')
-            self.entrymonitor.insert(0, monitorwave)
-
     def update(self, data):
+        """ This function manages the update of the
+        spectral data in the graph. It issues a read request to the spectrometer,
+        then conditionally processes the received data """
 
         self.data = spec.intensities()
 
-        if self.AbMode==1:
-            self.data = np.array(self.data, dtype=float)
-            self.data = np.log10((self.incident-self.dark)/(self.data-self.dark))
-            self.line.set_data(self.x, self.data)
-            monitor = np.round(self.data[monitorindex], decimals=3)
-            self.text.set_text(monitor)
-            return self.line,
+        self.data = np.array(self.data, dtype=float)
+        self.line.set_data(self.x, self.data)
+        monitor = np.round(self.data[monitor_index], decimals=3)
+        self.text.set_text(monitor)
+        return self.line,
 
-        else:
-            #y-axis handled by reset button
-            self.line.set_data(self.x, self.data)
-            monitor = np.round(self.data[monitorindex], decimals=3)
-            self.text.set_text(monitor)
-            return self.line,
 
 fig, ax = plt.subplots()
 app = Controller(ax)

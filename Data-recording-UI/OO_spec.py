@@ -26,8 +26,8 @@ NORM_FONT= ("Verdana", 10)
 
 # Enumerate spectrometer, set a default integration, get x & y extents
 spec = sb.Spectrometer.from_serial_number()
-IntTime = 20000  #20 ms, set default integration time to a reasonable value
-spec.integration_time_micros(IntTime)
+integration_time = 20000  #20 ms, set default integration time to a reasonable value
+spec.integration_time_micros(integration_time)
 x = spec.wavelengths()
 data = spec.intensities()                                   # correct_dark_counts=False, correct_nonlinearity=False
 xmin = np.around(min(x), decimals=2)
@@ -49,7 +49,7 @@ def popupmsg(msg):  # in case you want to have warning popup
 class Spec(tk.Tk):
     def __init__(self, ax, *args, **kwargs):
         global data, x, dark, incident
-        global IntTime, Averages
+        global integration_time, Averages
         global xmin, xmax, ymin, ymax
         global AbMode
         global monitorwave, monitorindex, monitor
@@ -188,16 +188,16 @@ class Spec(tk.Tk):
         
         # SET CONFIGURATION
     def setconfig(self):
-        global IntTime
+        global integration_time
         spec.integration_time_micros(IntTime)
         # write new configuration to dialog        
         self.entryint.delete(0, "end")
-        self.entryint.insert(0,IntTime / 1000)  #write ms, but IntTime is microseconds
+        self.entryint.insert(0,IntTime / 1000)  #write ms, but integration_time is microseconds
         self.entryavg.delete(0, "end")
         self.entryavg.insert(0,Averages)  #set text in averages box
 
     def EntryInt_return(self, event):
-        global IntTime
+        global integration_time
         #typically OO spectrometers cant read faster than 4 ms
         IntTimeTemp = self.entryint.get()
         if IntTimeTemp.isdigit() == True:
@@ -225,7 +225,7 @@ class Spec(tk.Tk):
         if Averages.isdigit() == True:
             Averages = int(float(Averages))
         else:
-            msg = "Averages must be an integer.  You tried " + str(Averages) + ".  Setting value to 1."
+            msg = "spectra_average must be an integer.  You tried " + str(Averages) + ".  Setting value to 1."
             Averages = 1
             self.entryavg.delete(0, "end")
             self.entryavg.insert(0,Averages)  #set text in averages box
