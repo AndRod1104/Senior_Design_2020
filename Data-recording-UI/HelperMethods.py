@@ -74,6 +74,7 @@ def disable_fields(*fields):
     for field in fields:
         field["state"] = "disabled"
 
+
 def enable_fields(*fields):
     for field in fields:
         field["state"] = "normal"
@@ -82,11 +83,13 @@ def enable_fields(*fields):
 def isDurationValid(duration):
     return MIN_DURATION < duration < MAX_DURATION
 
+
 def correct_email_format(email):
     regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
     if re.search(regex, email):
         return True
     return False
+
 
 def is_start_button(button):
     return button["text"] == "Start"
@@ -94,6 +97,7 @@ def is_start_button(button):
 
 def is_pause_button(button):
     return button["text"] == "Pause"
+
 
 # checks if any errors were built, printing them and returning false. If no errors, then returns true
 def check_fields_inputs(ageEntry=None, heightEntry=None, weightEntry=None, durationEntry=None, ethnicityOption=None,
@@ -202,6 +206,7 @@ def check_fields_inputs(ageEntry=None, heightEntry=None, weightEntry=None, durat
     else:
         showerror("Errors", "Please fix the following errors:\n" + error_message)
         return False
+
 
 def passwords_match(password, re_password):
     if password == re_password:

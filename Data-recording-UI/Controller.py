@@ -12,7 +12,6 @@ from tkinter import ttk, Entry
 import HelperMethods as hm
 import numpy as np
 from tkinter.messagebox import showerror
-from PIL import Image, ImageTk
 import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -54,9 +53,7 @@ class Controller(tk.Tk):
 
         # region Frames
         # Dictionary of class names, frames (Ex: HomePage, actual frame)
-        self.frames = {}
-
-        self.frames["LoginPage"] = LoginPage(container, self)
+        self.frames = {"LoginPage": LoginPage(container, self)}     # Initialize dictionary with LoginPage
         self.frames["LoginPage"].grid(row=0, column=0, sticky="nsew")
 
         self.frames["LogPatient"] = LogPatient(container, self)
@@ -71,11 +68,9 @@ class Controller(tk.Tk):
         self.frames["ResetPW"] = ResetPW(container, self)
         self.frames["ResetPW"].grid(row=0, column=0, sticky="nsew")
 
-
         # Starting page
         self.show_login_frame()
         # endregion
-
 
     # When called, passes the frame or page to be showed on windows
     def show_login_frame(self):
@@ -97,6 +92,7 @@ class Controller(tk.Tk):
     def show_resetPW_frame(self):
         frame = self.frames["SignUp"]
         frame.tkraise()
+
 
 class DataRecording(tk.Frame):
     body_part_option_selected = ""
@@ -341,7 +337,7 @@ class DataRecording(tk.Frame):
         def counter_label(timer_label):
             def count():
                 if self.running and self.current_ticking_value <= self.ticking_value_max:     # if from 0 to limit
-                    # To manage the intial delay.
+                    # To manage the initial delay.
                     if self.current_ticking_value == 18000:
                         display = "Starting..."
                     else:

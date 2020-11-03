@@ -1,6 +1,6 @@
 import tkinter as tk
 from Design import *
-from tkinter import ttk, Entry
+from tkinter import ttk
 import HelperMethods as hm
 
 

@@ -1,6 +1,6 @@
 import tkinter as tk
 from Design import *
-from tkinter import ttk, Entry
+from tkinter import ttk
 import HelperMethods as hm
 from PIL import Image, ImageTk
 
@@ -33,7 +33,7 @@ class LoginPage(tk.Frame):
         password_label = ttk.Label(self, text="Password *", font=SMALL_FONT)
         password_label.pack(pady=10, padx=10)
         password_entry = ttk.Entry(self, show=password_bullets)
-        password_entry.insert(0, "badbunny")  # 2TEST ERASE!!!
+        password_entry.insert(0, "badbunny")   # 2TEST ERASE!!!
         password_entry.pack()
 
         # Login Button
@@ -45,7 +45,8 @@ class LoginPage(tk.Frame):
         sign_up_button.pack()
 
         # Forgot Password Button
-        forgot_password_button = ttk.Button(self, text="Forgot Password", command=lambda: controller.show_resetPW_frame())
+        forgot_password_button = ttk.Button(self, text="Forgot Password",
+                                            command=lambda: controller.show_resetPW_frame())
         forgot_password_button.pack(pady=20, padx=10)
 
         # endregion
@@ -56,4 +57,3 @@ class LoginPage(tk.Frame):
                     passwordEntry=password_entry,
                     checkEmailFormat=email_entry.get()):
                 controller.show_patientLog_frame()
-

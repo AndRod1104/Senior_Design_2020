@@ -1,7 +1,6 @@
 import tkinter as tk
 from Design import *
-from tkinter import ttk, Entry
-import HelperMethods as hm
+from tkinter import ttk
 
 
 class ResetPW(tk.Frame):
@@ -18,6 +17,7 @@ class ResetPW(tk.Frame):
         f_name_entry = ttk.Entry(self)
         f_name_entry.pack()
 
-        send_button = ttk.Button(self, text="Send password reset", command=lambda: controller.show_frame(controller.frames["LoginPage"]))
+        send_button = ttk.Button(self, text="Send password reset",
+                                 command=lambda: controller.show_frame(controller.frames["LoginPage"]))
         send_button.pack(pady=30, padx=10)
         # endregion
