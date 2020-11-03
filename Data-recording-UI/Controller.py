@@ -45,42 +45,33 @@ class Controller(tk.Tk):
 
         self.geometry("1000x700")
 
-        # region Design
+
+        #region Frames
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
-        # endregion
 
-        # region Frames
         # Dictionary of class names, frames (Ex: HomePage, actual frame)
         self.frames = {}
-
         self.frames["LoginPage"] = LoginPage(container, self)
-        self.frames["LoginPage"].grid(row=0, column=0, sticky="nsew")
-
         self.frames["LogPatient"] = LogPatient(container, self)
-        self.frames["LogPatient"].grid(row=0, column=0, sticky="nsew")
-
         self.frames["DataRecording"] = DataRecording(container, self, ax)
-        self.frames["DataRecording"].grid(row=0, column=0, sticky="nsew")
-
         self.frames["SignUp"] = SignUp(container, self)
-        self.frames["SignUp"].grid(row=0, column=0, sticky="nsew")
-
         self.frames["ResetPW"] = ResetPW(container, self)
-        self.frames["ResetPW"].grid(row=0, column=0, sticky="nsew")
 
+        for frame in self.frames:
+            self.frames[frame].grid(row=0, column=0, sticky="nsew")
 
         # Starting page
         self.show_login_frame()
         # endregion
 
-
-    # When called, passes the frame or page to be showed on windows
+    #region Show frames functions
     def show_login_frame(self):
         frame = self.frames["LoginPage"]
         frame.tkraise()
+
 
     def show_patientLog_frame(self):
         frame = self.frames["LogPatient"]
@@ -95,8 +86,9 @@ class Controller(tk.Tk):
         frame.tkraise()
 
     def show_resetPW_frame(self):
-        frame = self.frames["SignUp"]
+        frame = self.frames["ResetPW"]
         frame.tkraise()
+    #endregion
 
 class DataRecording(tk.Frame):
     body_part_option_selected = ""
@@ -244,7 +236,7 @@ class DataRecording(tk.Frame):
                     print(result)
 
             else:   # normal session
-                print(self.duration_value)
+                print("Normal session")
 
             return
 
@@ -315,7 +307,8 @@ class DataRecording(tk.Frame):
         # checks for any errors, prints them and returns False, otherwise no errors and returns True
         def check_fields():
 
-            if hm.check_fields_inputs(durationEntry=self.duration_entry, bodyPartOption=self.body_part_option_selected.get()):
+            if hm.check_fields_inputs(durationEntry=self.duration_entry,
+                                      bodyPartOption=self.body_part_option_selected.get()):
 
                 self.duration_value = int(self.duration_entry.get())
                 return True
@@ -325,7 +318,7 @@ class DataRecording(tk.Frame):
 
         # region Stopwatch
         def create_stopwatch():
-            self.timer_label = tk.Label(self.frame1, text="Welcome!", fg="black", font="Verdana 15 bold")
+            self.timer_label = tk.Label(self.frame1, text="Stopwatch!", fg="black", font="Verdana 15 bold")
             self.timer_label.pack(pady=10)
             self.current_ticking_value = 18000  # we need to reset the timer after 1st recording
 
@@ -365,7 +358,7 @@ class DataRecording(tk.Frame):
             count()
         # endregion
 
-    ############ NEW METHODS ##############
+    #region Graph and connection to Pi
     def set_entry_config(self):
         """ This function handles new inputs on the text fields and it send values to spectrometer """
 
@@ -472,7 +465,7 @@ class DataRecording(tk.Frame):
         monitor = np.round(self.data[monitor_index], decimals=3)
         self.text.set_text(monitor)
         return self.line,
-
+    #endregion
 
 fig, ax = plt.subplots()
 app = Controller(ax)
