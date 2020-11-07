@@ -67,8 +67,9 @@ The end goal of this project is to create wearable devices that monitor blood pr
 ### Built With
 
 * [Python3]()
-* []()
-* []()
+* [Matplotlib]()
+* [Microsoft Azure]()
+* [Rapberry Pi]()
 
 
 
@@ -79,29 +80,42 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-TODO: Adding prerequisites here at a later date.  Below is a template
-* npm
+This code was run and tested on a Raspberry Pi 3b+ that was connected to a STS spectrometer from Ocean Optics. This two components are essential to make this code functional. However, [THIS](https://github.com/jonathanvanschenck/python-seatease) emulator can be used to run and test the code from any computer in the absence of a Raspberry Pi and/or spectrometer.  
+* Python-seabreeze
 ```sh
-npm install npm@latest -g
+pip install seabreeze
+seabreeze_os_setup
 ```
+For more information about this library [click here](https://github.com/ap--/python-seabreeze)
 
 ### Installation
 
 1. Clone the repo
 ```sh
-git clone https://github.com/apast005/QMS.git
+git clone https://github.com/CPRGB/Senior_Design_2020.git
 ```
-2. Install NPM packages
-```sh
-npm install
-```
-
+2. CONTINUE...
 
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+The graphical user interface makes pretty easy the interaction.
+
+<p align="center">
+The log in Page authenticates the researcher that will start the data recording on the patient. This screen also allows a new researcher to create an account and recover password in case they forget.
+  <a href="https://github.com/apast005/QMS">
+    <img src="Data-recording-UI/images/PathsUp.gif" alt="Logo" width="500" height="600">
+  </a>
+<p align="center">
+
+<p align="center">
+Test
+  <a href="https://github.com/apast005/QMS">
+    <img src="Data-recording-UI/images/PathsUp.gif" alt="Logo" width="500" height="600">
+  </a>
+<p align="center">
+
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
