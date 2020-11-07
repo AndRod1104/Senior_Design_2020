@@ -102,15 +102,15 @@ git clone https://github.com/CPRGB/Senior_Design_2020.git
 
 The graphical user interface makes pretty easy the interaction.
 
+* The "Log in" page authenticates the researcher that will start the data recording on the patient. This screen also allows a new researcher to create an account and recover password in case they forget.
 <p align="center">
-The log in Page authenticates the researcher that will start the data recording on the patient. This screen also allows a new researcher to create an account and recover password in case they forget.
   <a href="https://github.com/apast005/QMS">
     <img src="Data-recording-UI/images/PathsUp.gif" alt="Logo" width="500" height="600">
   </a>
 <p align="center">
 
+* The "Sign up" page is just to create a new user(researcher) and it asks for some basic information. 
 <p align="center">
-Test
   <a href="https://github.com/apast005/QMS">
     <img src="Data-recording-UI/images/PathsUp.gif" alt="Logo" width="500" height="600">
   </a>
