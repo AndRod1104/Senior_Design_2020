@@ -158,14 +158,14 @@ class DataRecording(tk.Frame):
                                   font=SMALL_FONT)
         spec_avg_label.pack(side='top', pady=4)
         self.spec_avg_entry = tk.Entry(self.frame2, width='7', justify='right')
-        self.spec_avg_entry.pack(side='top', pady=2)
+        self.spec_avg_entry.pack(side='top', pady=20)
         self.spec_avg_entry.bind('<Return>', self.validate_spec_avg)
 
         # Minimum wavelength label and entry field
         xmin_label = tk.Label(self.frame1, text='Minimum wavelength', font=SMALL_FONT)
         xmin_label.pack(side='top', pady=2)
         self.xmin_entry = tk.Entry(self.frame2, width='7', justify='right')
-        self.xmin_entry.pack(side='top', pady=2)
+        self.xmin_entry.pack(side='top', pady=5)
         self.xmin_entry.insert(0, xmin)                                           # AUTO INPUTS VALUE
         self.xmin_entry.bind('<Return>', self.validate_xmin)
 
@@ -182,7 +182,7 @@ class DataRecording(tk.Frame):
         self.body_part_option_selected = tk.StringVar()
         self.body_part_option_selected.set(hm.BodyParts[0])  # Initial Value
         body_part_options = ttk.OptionMenu(self.frame2, self.body_part_option_selected, *hm.BodyParts)
-        body_part_options.pack(side='top', pady=4)
+        body_part_options.pack(side='top', pady=15)
 
         btn_start_stop = ttk.Button(self.frame1, text="Start", command=lambda: start_stop_process())
         btn_start_stop.pack(side='top', pady=10)
