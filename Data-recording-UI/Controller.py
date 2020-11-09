@@ -194,7 +194,7 @@ class DataRecording(tk.Frame):
         btn_pause_resume.pack(side='top', pady=10)
 
         diff_patient_button = ttk.Button(self.frame2, text="Next Patient",
-                                         command=lambda: controller.show_frame("LogPatient"))
+                                         command=lambda: controller.show_patientLog_frame())
         diff_patient_button.pack(side='top', pady=10)
 
         log_out_button = tk.Button(self.frame1, text="Log out", command=lambda: controller.show_login_frame())

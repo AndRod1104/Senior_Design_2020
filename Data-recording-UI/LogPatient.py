@@ -6,8 +6,7 @@ import Connection as conn
 
 researcher_id = 2               # Need to get this value from researcher table
 bmi = 28.4                      # Need to get this value from researcher table
-subject = 'subject'             # name of subject db
-researcher = 'researcher'
+
 
 class LogPatient(tk.Frame):
     # values for all entries
@@ -90,8 +89,9 @@ class LogPatient(tk.Frame):
                 print(self.skin_color_type.get())
 
                 # Save patient to database in azure
-                conn.insert(subject, researcher_id, self.age_value, self.weight_value, self.height_value, bmi,
-                            self.ethnicity_option_selected.get(), self.skin_color_type.get(), self.gender_option_selected.get())
+                conn.insert(conn.subject, researcher_id, self.age_value, self.weight_value, self.height_value, bmi,
+                            self.ethnicity_option_selected.get(), self.skin_color_type.get(),
+                            self.gender_option_selected.get())
 
                 # move to recording page
                 controller.show_dataRecording_frame()

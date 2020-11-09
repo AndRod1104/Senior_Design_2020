@@ -2,7 +2,7 @@ import tkinter as tk
 from Design import *
 from tkinter import ttk
 import HelperMethods as hm
-import psycopg2
+import Connection as conn
 
 
 class SignUp(tk.Frame):
@@ -11,6 +11,7 @@ class SignUp(tk.Frame):
     last_name = ""
     email = ""
     institution = ""
+    pw = ""
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -74,13 +75,14 @@ class SignUp(tk.Frame):
                     passwordEntry=password_entry,
                     reEnterPasswordEntry=retype_password_entry,
                     emailEntry=email_entry,
-                    checkEmailFormat=email_entry.get(),
-            ):
+                    checkEmailFormat=email_entry.get()):
                 get_values()
                 print(self.first_name)
                 print(self.middle_Initial)
                 print(self.last_name)
                 print(self.institution)
+
+                conn.insert(conn.researcher, )
 
         def get_values():
             self.first_name = f_name_entry.get()
@@ -88,4 +90,5 @@ class SignUp(tk.Frame):
             self.last_name = l_name_entry.get()
             self.email = email_entry.get()
             self.institution = inst_entry.get()
+            self.pw = password_entry.get()
         # endregion

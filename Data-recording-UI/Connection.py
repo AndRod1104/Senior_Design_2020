@@ -1,5 +1,9 @@
 import psycopg2
 
+subject = 'subject'
+researcher = 'researcher'
+data = 'processed_data'
+
 # Update connection string information
 host = "wearable-bmi-db.postgres.database.azure.com"
 dbname = "bmi"
@@ -15,17 +19,23 @@ print("Connection established")
 cursor = conn.cursor()
 
 
-def insert(table, a, b, c, d, e, f, g, h):
+def insert(table, *args):
+    """ Handles insertions into any of the 3 tables in our azure database"""
     if table is 'subject':
         ins_query = "INSERT INTO subject (researcher_id, age, weight, height, bmi, ethnicity, fitzpatrick, gender) " \
                     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
-        vals = (a, b, c, d, e, f, g, h)
+        vals = (args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7])
         cursor.execute(ins_query, vals)
         print('inserted into subject')
 
 
-def close_conn():
-    # Clean up
+def commit():
+    """ Saves modifications to database like insertions remotely """
     conn.commit()
+
+
+def close():
+    """ Close connection to Azure database. Must be called at the end """
     cursor.close()
     conn.close()
+
