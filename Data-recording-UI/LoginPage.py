@@ -3,6 +3,7 @@ from Design import *
 from tkinter import ttk
 import HelperMethods as hm
 from PIL import Image, ImageTk
+import psycopg2
 
 
 class LoginPage(tk.Frame):

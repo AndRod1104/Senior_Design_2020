@@ -4,7 +4,7 @@ from LoginPage import *
 from SignUp import *
 from ResetPW import *
 from LogPatient import *
-
+import psycopg2
 import tkinter as tk
 from datetime import datetime
 from Design import *

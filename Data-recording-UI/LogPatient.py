@@ -2,7 +2,24 @@ import tkinter as tk
 from Design import *
 from tkinter import ttk
 import HelperMethods as hm
+import psycopg2
 
+# Update connection string information
+host = "wearable-bmi-db.postgres.database.azure.com"
+dbname = "bmi"
+user = "jose@wearable-bmi-db"
+password = "seniorproject1."
+sslmode = "require"
+
+# Construct connection string
+conn_string = f"host={host} user={user} dbname={dbname} password={password} sslmode={sslmode}"
+conn = psycopg2.connect(conn_string)
+print("Connection established")
+
+cursor = conn.cursor()
+
+researcher_id = 2               # Need to get this value from researcher table
+bmi = 28.4                      # Need to get this value from researcher table
 
 class LogPatient(tk.Frame):
     # values for all entries
@@ -80,9 +97,22 @@ class LogPatient(tk.Frame):
                 print(self.age_value)
                 print(self.height_value)
                 print(self.weight_value)
-                print(self.ethnicity_option_selected.get())
-                print(self.gender_option_selected.get())
-                print(self.skin_color_type.get())
+                print(self.ethnicity_option_selected)
+                print(self.gender_option_selected)
+                print(self.skin_color_type)
+
+                # Save patient to database in azure
+                cursor.execute(
+                    "INSERT INTO subject (researcher_id, age, weight, height, bmi, ethnicity, fitzpatrick, gender) "
+                    "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);",
+                    (researcher_id,
+                     self.age_value,
+                     self.weight_value,
+                     self.height_value, bmi,
+                     self.ethnicity_option_selected,
+                     self.skin_color_type,
+                     self.gender_option_selected))
+
                 # move to recording page
                 controller.show_dataRecording_frame()
 
@@ -100,9 +130,12 @@ class LogPatient(tk.Frame):
                     genderOption=self.gender_option_selected.get(),
                     skinColorOption=self.skin_color_type.get()):
 
-                self.age_value = int(age_entry.get())
-                self.height_value = float(height_entry.get())
-                self.weight_value = int(weight_entry.get())
+                self.age_value = str(age_entry.get())
+                self.height_value = str(height_entry.get())
+                self.weight_value = str(weight_entry.get())
+                self.ethnicity_option_selected = str(self.ethnicity_option_selected.get())
+                self.skin_color_type = str(self.skin_color_type.get())
+                self.gender_option_selected = str(self.gender_option_selected.get())
                 return True
             else:
                 return False

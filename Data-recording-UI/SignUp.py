@@ -2,6 +2,7 @@ import tkinter as tk
 from Design import *
 from tkinter import ttk
 import HelperMethods as hm
+import psycopg2
 
 
 class SignUp(tk.Frame):
