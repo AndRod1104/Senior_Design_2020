@@ -1,7 +1,6 @@
 import tkinter as tk
 from Design import *
 from tkinter import ttk
-import psycopg2
 
 
 class ResetPW(tk.Frame):
