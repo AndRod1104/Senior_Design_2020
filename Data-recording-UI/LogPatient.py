@@ -95,7 +95,6 @@ class LogPatient(tk.Frame):
 
                 # move to recording page
                 controller.show_dataRecording_frame()
-                conn.close_conn()                       # No need to call it here
 
             return
 

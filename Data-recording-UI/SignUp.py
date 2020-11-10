@@ -1,8 +1,12 @@
+import binascii
+import hashlib
+import os
 import tkinter as tk
-from Design import *
 from tkinter import ttk
-import HelperMethods as hm
+
 import Connection as conn
+import HelperMethods as hm
+from Design import *
 
 
 class SignUp(tk.Frame):
@@ -82,7 +86,12 @@ class SignUp(tk.Frame):
                 print(self.last_name)
                 print(self.institution)
 
-                conn.insert(conn.researcher, )
+                # Call the function to hash pw and save it to variable
+                hashed_pw = hash_password(self.pw)
+                # Save new researcher into Azure database
+                conn.insert(conn.researcher, self.email, hashed_pw, self.first_name, self.middle_Initial,
+                            self.last_name, self.institution)
+                controller.show_login_frame()
 
         def get_values():
             self.first_name = f_name_entry.get()
@@ -91,4 +100,11 @@ class SignUp(tk.Frame):
             self.email = email_entry.get()
             self.institution = inst_entry.get()
             self.pw = password_entry.get()
+
+        def hash_password(pw):
+            """Hash a password for storing."""
+            salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
+            pwhash = hashlib.pbkdf2_hmac('sha512', pw.encode('utf-8'), salt, 100000)
+            pwhash = binascii.hexlify(pwhash)
+            return (salt + pwhash).decode('ascii')
         # endregion

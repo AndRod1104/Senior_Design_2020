@@ -1,9 +1,13 @@
+import binascii
+import hashlib
 import tkinter as tk
-from Design import *
 from tkinter import ttk
-import HelperMethods as hm
+
 from PIL import Image, ImageTk
-import psycopg2
+
+import Connection as conn
+import HelperMethods as hm
+from Design import *
 
 
 class LoginPage(tk.Frame):
@@ -53,8 +57,23 @@ class LoginPage(tk.Frame):
         # endregion
 
         def check_credentials():
-            if hm.check_fields_inputs(
-                    emailEntry=email_entry,
-                    passwordEntry=password_entry,
-                    checkEmailFormat=email_entry.get()):
-                controller.show_patientLog_frame()
+            if hm.check_fields_inputs(emailEntry=email_entry,
+                                      passwordEntry=password_entry,
+                                      checkEmailFormat=email_entry.get()):
+                # Get list of emails from db and check if input email is in that list
+                email_list = conn.multi_select('email', conn.researcher)
+                for email in email_list:
+                    if email_entry.get() == email:
+                        stored_pw = conn.select('passwrd', conn.researcher, 'email', email_entry.get())
+                        # If email is in the list verify the password and allow access, else prompt error
+                        if verify_password(stored_pw, password_entry):
+                            controller.show_patientLog_frame()
+                print("THIS EMAIL DOES NOT EXIST IN THE DB. SIGN UP")       # todo POP UP MESSAGE
+
+        def verify_password(stored_pw, provided_pw):
+            """Verify a stored password against one provided by user"""
+            salt = stored_pw[:64]
+            stored_pw = stored_pw[64:]
+            pwhash = hashlib.pbkdf2_hmac('sha512', provided_pw.encode('utf-8'), salt.encode('ascii'), 100000)
+            pwhash = binascii.hexlify(pwhash).decode('ascii')
+            return pwhash == stored_pw
