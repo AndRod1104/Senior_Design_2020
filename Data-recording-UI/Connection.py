@@ -23,24 +23,23 @@ cursor = conn.cursor()
 # Methods to query database
 def insert(table, *args):
     """ Handles insertions into any of the 3 tables in our azure database"""
+    ins_query = ""
+    val = ""
     if table is subject:
         ins_query = "INSERT INTO subject (researcher_id, age, weight, height, bmi, ethnicity, fitzpatrick, gender) " \
                     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s);"
         val = (args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7])
-        cursor.execute(ins_query, val)
-        conn.commit()
     elif table is researcher:
         ins_query = "INSERT INTO researcher (email, passwrd, f_name, m_initial, l_name, institution) " \
                     "VALUES (%s, %s, %s, %s, %s, %s);"
         val = (args[0], args[1], args[2], args[3], args[4], args[5])
-        cursor.execute(ins_query, val)
-        conn.commit()
     elif table is data:
         ins_query = "INSERT INTO processed_data (body_location, subject_id, wave_length, absorbance, time_date) " \
                     "VALUES (%s, %s, %s, %s, %s);"
         val = (args[0], args[1], args[2], args[3], args[4], args[5])
-        cursor.execute(ins_query, val)
-        conn.commit()
+
+    cursor.execute(ins_query, val)
+    conn.commit()
 
 
 def multi_select(column, table):
@@ -57,6 +56,17 @@ def select(column, table, pk, pk_val):
     cursor.execute(select_query, val)
     output = cursor.fetchone()
     return output[0]
+
+
+def email_exist(an_email):
+    """ Checks for input email to see if it already exists in db """
+    email_list = multi_select('email', researcher)
+    for email in email_list:
+        if an_email == email[0]:
+            return True
+
+    return False
+
 
 
 def close():

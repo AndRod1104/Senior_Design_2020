@@ -1,5 +1,11 @@
 import re
 from tkinter.messagebox import showerror
+
+# Fonts
+LARGE_FONT = ("Verdana", 14)
+MEDIUM_FONT = ("Verdana", 12)
+SMALL_FONT = ("Verdana", 10)
+
 # region Min-Max values
 MIN_AGE = 17
 MAX_AGE = 100
@@ -204,7 +210,7 @@ def check_fields_inputs(ageEntry=None, heightEntry=None, weightEntry=None, durat
     if isEmpty(error_message):
         return True
     else:
-        showerror("Errors", "Please fix the following errors:\n" + error_message)
+        showerror("Error", "Please fix the following errors:\n" + error_message)
         return False
 
 

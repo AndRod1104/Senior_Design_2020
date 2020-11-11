@@ -4,7 +4,6 @@ from LoginPage import *
 from SignUp import *
 from ResetPW import *
 from LogPatient import *
-import psycopg2
 import tkinter as tk
 from datetime import datetime
 from Design import *
@@ -139,7 +138,7 @@ class DataRecording(tk.Frame):
 
         id_label = tk.Label(self.frame1, text="Patient ID:", font=SMALL_FONT)
         id_label.pack(side='top', pady=4)
-        id_val = tk.Label(self.frame2, text="001", font=SMALL_FONT)                 # Interactive get subjID from DB
+        id_val = tk.Label(self.frame2, text=LogPatient.patient_id, font=SMALL_FONT)
         id_val.pack(side='top', pady=4)
         filler_label = tk.Label(self.frame3, text="")
         filler_label.pack(side='top')

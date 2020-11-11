@@ -7,7 +7,6 @@ import Connection as conn
 researcher_id = 2               # Need to get this value from researcher table
 bmi = 28.4                      # Need to get this value from researcher table
 
-
 class LogPatient(tk.Frame):
     # values for all entries
     age_value = 0
@@ -17,6 +16,12 @@ class LogPatient(tk.Frame):
     ethnicity_option_selected = ""
     gender_option_selected = ""
     duration_value = 0
+    patient_id = 1
+    id_list = conn.multi_select('subject_id', conn.subject)     # Initialize list with all subjects' ids
+
+    # Check for empty subject table and if not empty get the patient's id to display
+    if id_list != []:
+        patient_id = id_list[-1][0] + 1
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -27,7 +32,7 @@ class LogPatient(tk.Frame):
 
         id_label = ttk.Label(self, text="Patient ID:", font=SMALL_FONT)
         id_label.grid(row=2, column=0, padx=0, pady=10)
-        id_val = ttk.Label(self, text="001", font=SMALL_FONT)  # Interactive get subjID from DB
+        id_val = ttk.Label(self, text=self.patient_id, font=SMALL_FONT)  # Interactive get subjID from DB
         id_val.grid(row=2, column=1)
 
         age_label = ttk.Label(self, text="Age:", font=SMALL_FONT)
@@ -92,6 +97,7 @@ class LogPatient(tk.Frame):
                 conn.insert(conn.subject, researcher_id, self.age_value, self.weight_value, self.height_value, bmi,
                             self.ethnicity_option_selected.get(), self.skin_color_type.get(),
                             self.gender_option_selected.get())
+                print("se salvó")
 
                 # move to recording page
                 controller.show_dataRecording_frame()

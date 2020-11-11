@@ -32,14 +32,14 @@ class LoginPage(tk.Frame):
         email_label = ttk.Label(self, text="Email *", font=SMALL_FONT)
         email_label.pack(pady=10, padx=10)
         email_entry = ttk.Entry(self)
-        email_entry.insert(0, "test@yahoo.com")  # 2TEST ERASE!!!
+        email_entry.insert(0, "user@yahoo.com")  # 2TEST ERASE!!!
         email_entry.pack()
 
         # Password label and entry box
         password_label = ttk.Label(self, text="Password *", font=SMALL_FONT)
         password_label.pack(pady=10, padx=10)
         password_entry = ttk.Entry(self, show=password_bullets)
-        password_entry.insert(0, "badbunny")   # 2TEST ERASE!!!
+        password_entry.insert(0, "user")   # 2TEST ERASE!!!
         password_entry.pack()
 
         # Login Button
@@ -62,18 +62,15 @@ class LoginPage(tk.Frame):
                                       passwordEntry=password_entry,
                                       checkEmailFormat=email_entry.get()):
                 # Get list of emails from db and check if input email is in that list
-                email_list = conn.multi_select('email', conn.researcher)
-                for email in email_list:
-                    print(email_entry.get())
-                    print(email[0])
-                    if email_entry.get() == email[0]:
-                        print("here")
-                        stored_pw = conn.select('passwrd', conn.researcher, 'email', email_entry.get())
-                        # If email is in the list verify the password and allow access, else prompt error
-                        if verify_password(stored_pw, password_entry.get()):
-                            print("pw matched")
-                            controller.show_patientLog_frame()
-                print("THIS EMAIL DOES NOT EXIST IN THE DB. SIGN UP")       # todo POP UP MESSAGE
+                if conn.email_exist(email_entry.get()):
+                    stored_pw = conn.select('passwrd', conn.researcher, 'email', email_entry.get())
+                    # If email is in the list verify the password and allow access, else prompt error
+                    if verify_password(stored_pw, password_entry.get()):
+                        controller.show_patientLog_frame()
+                    else:
+                        hm.showerror("Authentication Error", "\u2022    Wrong Password. Try again")
+                else:
+                    hm.showerror("Error", "\u2022    This email is not registered")
 
         def verify_password(stored_pw, provided_pw):
             """Verify a stored password against one provided by user"""
