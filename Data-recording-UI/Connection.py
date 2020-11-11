@@ -20,6 +20,7 @@ print("Connection established")
 cursor = conn.cursor()
 
 
+# Methods to query database
 def insert(table, *args):
     """ Handles insertions into any of the 3 tables in our azure database"""
     if table is subject:
@@ -43,17 +44,16 @@ def insert(table, *args):
 
 
 def multi_select(column, table):
-    select_query = "SELECT %s FROM %s;"
-    val = (column, table)
-    cursor.execute(select_query, val)
+    """ Select a whole column from a table """
+    cursor.execute(f"SELECT {column} FROM {table};")
     output = cursor.fetchall()
     return output
 
 
 def select(column, table, pk, pk_val):
     """ Select a specific value from a table by inputting primary key """
-    select_query = "SELECT %s FROM %s WHERE %s = %s;"
-    val = (column, table, pk, pk_val)
+    select_query = f"SELECT {column} FROM {table} WHERE {pk} = %s;"
+    val = (pk_val,)
     cursor.execute(select_query, val)
     output = cursor.fetchone()
     return output[0]

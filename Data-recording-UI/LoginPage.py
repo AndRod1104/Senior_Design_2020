@@ -1,5 +1,6 @@
 import binascii
 import hashlib
+import os
 import tkinter as tk
 from tkinter import ttk
 
@@ -63,10 +64,14 @@ class LoginPage(tk.Frame):
                 # Get list of emails from db and check if input email is in that list
                 email_list = conn.multi_select('email', conn.researcher)
                 for email in email_list:
-                    if email_entry.get() == email:
+                    print(email_entry.get())
+                    print(email[0])
+                    if email_entry.get() == email[0]:
+                        print("here")
                         stored_pw = conn.select('passwrd', conn.researcher, 'email', email_entry.get())
                         # If email is in the list verify the password and allow access, else prompt error
-                        if verify_password(stored_pw, password_entry):
+                        if verify_password(stored_pw, password_entry.get()):
+                            print("pw matched")
                             controller.show_patientLog_frame()
                 print("THIS EMAIL DOES NOT EXIST IN THE DB. SIGN UP")       # todo POP UP MESSAGE
 
