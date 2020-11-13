@@ -1,6 +1,5 @@
 import seatease.spectrometers as s  # Emulator to test w/o spectrometer
 
-from LoginPage import *
 from SignUp import *
 from ResetPW import *
 from LogPatient import *
@@ -359,7 +358,6 @@ class DataRecording(tk.Frame):
     #region Graph and connection to Pi
     def set_entry_config(self):
         """ This function handles new inputs on the text fields and it send values to spectrometer """
-
         global integration_time
         spec.integration_time_micros(integration_time)
         # write new configuration to dialog
@@ -370,10 +368,10 @@ class DataRecording(tk.Frame):
 
     def validate_integration_time(self, event):
         """ Update integration time and validates from 4ms to 65000 """
-
         global integration_time
         # typically OO spectrometers cant read faster than 4 ms
         int_time_temp = self.duration_entry.get()
+
         if int_time_temp.isdigit():
             if int(int_time_temp) > 65000:
                 msg = "The integration time must be 65000 ms or smaller.  You set " + int_time_temp
@@ -407,9 +405,9 @@ class DataRecording(tk.Frame):
 
     def validate_xmax(self, event):
         """ Validates max wavelength to show in graph """
-
         global xmax
         xmax_temp = self.entryxmax.get()
+
         try:
             float(xmax_temp)
             xmax_temp = float(self.entryxmax.get())
@@ -430,9 +428,9 @@ class DataRecording(tk.Frame):
 
     def validate_xmin(self, event):
         """ Validates min wavelength to show in graph """
-
         global xmin
         xmin_temp = self.xmin_entry.get()
+
         try:
             float(xmin_temp)
             xmin_temp = float(self.xmin_entry.get())
@@ -455,9 +453,7 @@ class DataRecording(tk.Frame):
         """ This function manages the update of the
         spectral data in the graph. It issues a read request to the spectrometer,
         then conditionally processes the received data """
-
         self.data = spec.intensities()
-
         self.data = np.array(self.data, dtype=float)
         self.line.set_data(self.x, self.data)
         monitor = np.round(self.data[monitor_index], decimals=3)

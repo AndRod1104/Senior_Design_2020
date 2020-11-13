@@ -1,6 +1,5 @@
 import binascii
 import hashlib
-import os
 import tkinter as tk
 from tkinter import ttk
 
@@ -66,6 +65,8 @@ class LoginPage(tk.Frame):
                     stored_pw = conn.select('passwrd', conn.researcher, 'email', email_entry.get())
                     # If email is in the list verify the password and allow access, else prompt error
                     if verify_password(stored_pw, password_entry.get()):
+                        hm.current_researcher = conn.select('researcher_id', conn.researcher,
+                                                            'email', email_entry.get())
                         controller.show_patientLog_frame()
                     else:
                         hm.showerror("Authentication Error", "\u2022    Wrong Password. Try again")

@@ -1,11 +1,12 @@
+from LoginPage import *
 import tkinter as tk
 from Design import *
 from tkinter import ttk
 import HelperMethods as hm
 import Connection as conn
 
-researcher_id = 2               # Need to get this value from researcher table
 bmi = 28.4                      # Need to get this value from researcher table
+
 
 class LogPatient(tk.Frame):
     # values for all entries
@@ -84,7 +85,6 @@ class LogPatient(tk.Frame):
 
         # region methods
         def save_and_go_to_recording_page():
-
             if get_values():
                 print(self.age_value)
                 print(self.height_value)
@@ -94,10 +94,9 @@ class LogPatient(tk.Frame):
                 print(self.skin_color_type.get())
 
                 # Save patient to database in azure
-                conn.insert(conn.subject, researcher_id, self.age_value, self.weight_value, self.height_value, bmi,
-                            self.ethnicity_option_selected.get(), self.skin_color_type.get(),
-                            self.gender_option_selected.get())
-                print("se salvó")
+                conn.insert(conn.subject, hm.current_researcher, self.age_value, self.weight_value,
+                            self.height_value, bmi, self.ethnicity_option_selected.get(),
+                            self.skin_color_type.get(), self.gender_option_selected.get())
 
                 # move to recording page
                 controller.show_dataRecording_frame()
@@ -107,7 +106,6 @@ class LogPatient(tk.Frame):
         # get_values stores all values from fields into variables and returns any errors found when trying to
         # convert each field into its respective type
         def get_values():
-
             if hm.check_fields_inputs(
                     ageEntry=age_entry,
                     heightEntry=height_entry,

@@ -1,11 +1,6 @@
 import re
 from tkinter.messagebox import showerror
 
-# Fonts
-LARGE_FONT = ("Verdana", 14)
-MEDIUM_FONT = ("Verdana", 12)
-SMALL_FONT = ("Verdana", 10)
-
 # region Min-Max values
 MIN_AGE = 17
 MAX_AGE = 100
@@ -21,6 +16,9 @@ MAX_HEIGHT = 8.00
 # Duration is in seconds
 MIN_DURATION = 1
 MAX_DURATION = 120  # 2 min
+
+# Keeps track of the researcher logged in
+current_researcher = 0
 
 DEFAULT_SCROLLDOWNMENU_OPTION = "Select an option"
 

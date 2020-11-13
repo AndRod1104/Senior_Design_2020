@@ -86,12 +86,16 @@ class SignUp(tk.Frame):
                 print(self.last_name)
                 print(self.institution)
 
-                # Call the function to hash pw and save it to variable
-                hashed_pw = hash_password(self.pw)
-                # Save new researcher into Azure database
-                conn.insert(conn.researcher, self.email, hashed_pw, self.first_name, self.middle_Initial,
-                            self.last_name, self.institution)
-                controller.show_login_frame()
+                # Check if email is already in use by another researcher
+                if conn.email_exist(email_entry.get()):
+                    hm.showerror("Error", "\u2022    This email is already registered.\n      Please use another email")
+                else:
+                    # Call the function to hash pw and save it to variable
+                    hashed_pw = hash_password(self.pw)
+                    # Save new researcher into Azure database
+                    conn.insert(conn.researcher, self.email, hashed_pw, self.first_name, self.middle_Initial,
+                                self.last_name, self.institution)
+                    controller.show_login_frame()
 
         def get_values():
             self.first_name = f_name_entry.get()
