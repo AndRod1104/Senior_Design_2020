@@ -19,6 +19,8 @@ import matplotlib.animation as animation
 from matplotlib import style
 style.use("ggplot")
 
+import csv
+
 spec = s.Spectrometer.from_first_available()
 dev_list = s.list_devices()  # Part of emulator
 spec = s.Spectrometer(dev_list[0])  # Part of emulator
@@ -394,6 +396,7 @@ class DataRecording(tk.Frame):
     def validate_spec_avg(self, event):
         ## averaging needs to be implemented here in code
         #  cseabreeze has average working, but python-seabreeze doesn't (2019)
+        np.weigthed
         global spectra_average
         spectra_average = self.spec_avg_entry.get()
         if spectra_average.isdigit():
@@ -455,7 +458,11 @@ class DataRecording(tk.Frame):
         """ This function manages the update of the
         spectral data in the graph. It issues a read request to the spectrometer,
         then conditionally processes the received data """
-        print(f"x: {self.x}, y: {self.data}")
+
+        with open("demo.csv", "w", newline='') as towrite:
+            lineWriter = csv.writer(towrite, quotechar = '|', delimiter='\n', quoting=csv.QUOTE_NONE)
+            lineWriter.writerow(self.x)
+
         self.data = spec.intensities()
         self.data = np.array(self.data, dtype=float)
         self.line.set_data(self.x, self.data)
