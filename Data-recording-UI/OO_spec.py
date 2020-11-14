@@ -49,7 +49,7 @@ def popupmsg(msg):  # in case you want to have warning popup
 class Spec(tk.Tk):
     def __init__(self, ax, *args, **kwargs):
         global data, x, dark, incident
-        global integration_time, Averages
+        global IntTime, Averages
         global xmin, xmax, ymin, ymax
         global AbMode
         global monitorwave, monitorindex, monitor

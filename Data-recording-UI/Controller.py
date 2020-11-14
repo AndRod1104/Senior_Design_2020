@@ -98,6 +98,8 @@ class DataRecording(tk.Frame):
 
     AbMode = 0  # start in raw intensity mode
 
+
+
     def __init__(self, parent, controller, ax):
         global data, x
         global integration_time, spectra_average
@@ -453,6 +455,7 @@ class DataRecording(tk.Frame):
         """ This function manages the update of the
         spectral data in the graph. It issues a read request to the spectrometer,
         then conditionally processes the received data """
+        print(f"x: {self.x}, y: {self.data}")
         self.data = spec.intensities()
         self.data = np.array(self.data, dtype=float)
         self.line.set_data(self.x, self.data)
