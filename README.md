@@ -83,7 +83,7 @@ To get a local copy up and running follow these simple steps.
 This code was run and tested on a Raspberry Pi 3b+ that was connected to a STS spectrometer from Ocean Optics. This two components are essential to make this code functional. However, [THIS](https://github.com/jonathanvanschenck/python-seatease) emulator can be used to run and test the code from any computer in the absence of a Raspberry Pi and/or spectrometer.  
 * Python-seabreeze
 ```sh
-pip install seabreeze
+pip3 install seabreeze
 seabreeze_os_setup
 ```
 For more information about this library [click here](https://github.com/ap--/python-seabreeze)
