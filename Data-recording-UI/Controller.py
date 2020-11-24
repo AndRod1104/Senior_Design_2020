@@ -1,4 +1,5 @@
-import seatease.spectrometers as s  # Emulator to test w/o spectrometer
+# import seatease.spectrometers as s  # Emulator to test w/o spectrometer
+import seabreeze.spectrometers as s
 
 from SignUp import *
 from ResetPW import *
@@ -11,29 +12,30 @@ import HelperMethods as hm
 import numpy as np
 from tkinter.messagebox import showerror
 import matplotlib
+
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
+
 style.use("ggplot")
 
 import csv
 
-spec = s.Spectrometer.from_first_available()
-dev_list = s.list_devices()  # Part of emulator
-spec = s.Spectrometer(dev_list[0])  # Part of emulator
+dev_list = s.list_devices()
+spec = s.Spectrometer(dev_list[0])  # Assign detected spectrometer to variable spec
 integration_time = 20000  # 20 ms, set default integration time to a reasonable value
-spectra_average = 1
 spec.integration_time_micros(integration_time)
+
 x = spec.wavelengths()
-data = spec.intensities()  # correct_dark_counts=True, correct_nonlinearity=False PUT BACK IN ()
+data = spec.intensities()
 xmin = np.around(min(x), decimals=2)
 xmax = np.around(max(x), decimals=2)
 ymin = np.around(min(data), decimals=2)
 ymax = np.around(max(data), decimals=2)
-# minIntTime =spec.minimum_integration_time_micros          UNCOMMENT
+minIntTime = spec.minimum_integration_time_micros
 
 
 class Controller(tk.Tk):
@@ -99,8 +101,6 @@ class DataRecording(tk.Frame):
     timer_label = ""
 
     AbMode = 0  # start in raw intensity mode
-
-
 
     def __init__(self, parent, controller, ax):
         global data, x
@@ -168,7 +168,7 @@ class DataRecording(tk.Frame):
         xmin_label.pack(side='top', pady=2)
         self.xmin_entry = tk.Entry(self.frame2, width='7', justify='right')
         self.xmin_entry.pack(side='top', pady=2)
-        self.xmin_entry.insert(0, xmin)                                           # AUTO INPUTS VALUE
+        self.xmin_entry.insert(0, xmin)  # AUTO INPUTS VALUE
         self.xmin_entry.bind('<Return>', self.validate_xmin)
 
         # Maximum wavelength label and entry field
@@ -176,7 +176,7 @@ class DataRecording(tk.Frame):
         xmax_label.pack(side='top', pady=2)
         self.entryxmax = tk.Entry(self.frame2, width='7', justify='right')
         self.entryxmax.pack(side='top', pady=2)
-        self.entryxmax.insert(0, xmax)                                          # AUTO INPUTS VALUE
+        self.entryxmax.insert(0, xmax)  # AUTO INPUTS VALUE
         self.entryxmax.bind('<Return>', self.validate_xmax)
 
         body_part_label = tk.Label(self.frame1, text="Body Location:", height='2', font=SMALL_FONT)
@@ -258,7 +258,7 @@ class DataRecording(tk.Frame):
             start_stopwatch(self.timer_label)
             hm.disable_fields(body_part_options, self.duration_entry)
 
-            #TODO
+            # TODO
             # Connect to save again values with different body part in DB
             print(self.duration_value)
             print(self.body_part_option_selected.get())
@@ -266,7 +266,7 @@ class DataRecording(tk.Frame):
             return
 
         def pause_process():
-            #TODO
+            # TODO
             # Do we want to change the duration and body part once user pauses? *** BUG ***
             btn_pause_resume["text"] = "Resume"
             self.running = False
@@ -275,7 +275,7 @@ class DataRecording(tk.Frame):
 
         def start_stop_process():
 
-            if check_fields():    # no errors
+            if check_fields():  # no errors
                 if hm.is_start_button(btn_start_stop):
                     start_process()
                 else:
@@ -334,7 +334,7 @@ class DataRecording(tk.Frame):
 
         def counter_label(timer_label):
             def count():
-                if self.running and self.current_ticking_value <= self.ticking_value_max:     # if from 0 to limit
+                if self.running and self.current_ticking_value <= self.ticking_value_max:  # if from 0 to limit
                     # To manage the initial delay.
                     if self.current_ticking_value == 18000:
                         display = "Starting..."
@@ -348,27 +348,27 @@ class DataRecording(tk.Frame):
                     timer_label.after(1000, count)
                     self.current_ticking_value += 1
 
-                elif not self.running and self.current_ticking_value <= self.ticking_value_max:   # if paused
+                elif not self.running and self.current_ticking_value <= self.ticking_value_max:  # if paused
                     timer_label['text'] = "Paused..."
 
                 else:
                     timer_label['text'] = "Finished!"
                     hm.disable_fields(btn_pause_resume)
                     btn_pause_resume["text"] = "Pause"
+
             # Triggering the start of the counter.
             count()
         # endregion
 
-    #region Graph and connection to Pi
+    # region Graph and connection to Pi
     def set_entry_config(self):
         """ This function handles new inputs on the text fields and it send values to spectrometer """
-        global integration_time
+        global integration_time  # , spectra_average
         spec.integration_time_micros(integration_time)
+        # spec.scans_to_average(spectra_average)
         # write new configuration to dialog
         self.duration_entry.delete(0, "end")
         self.duration_entry.insert(0, integration_time / 1000)  # write ms, but integration_time is microseconds
-        self.spec_avg_entry.delete(0, "end")
-        self.spec_avg_entry.insert(0, spectra_average)  # set text in averages box
 
     def validate_integration_time(self, event):
         """ Update integration time and validates from 4ms to 65000 """
@@ -380,33 +380,38 @@ class DataRecording(tk.Frame):
             if int(int_time_temp) > 65000:
                 msg = "The integration time must be 65000 ms or smaller.  You set " + int_time_temp
                 self.set_entry_config()
-                #popupmsg(msg)
+                # popupmsg(msg)
             elif int(int_time_temp) < 4:
                 msg = "The integration time must be greater than 4 ms.  You set " + int_time_temp
                 self.set_entry_config()
-                #popupmsg(msg)
+                # popupmsg(msg)
             else:
                 integration_time = int(int_time_temp) * 1000  # convert ms to microseconds
                 self.set_entry_config()
         else:
             msg = "Integration time must be an integer between 4 and 65000 ms.  You set " + str(int_time_temp)
             self.set_entry_config()
-            #popupmsg(msg)
+            # popupmsg(msg)
 
     def validate_spec_avg(self, event):
         ## averaging needs to be implemented here in code
         #  cseabreeze has average working, but python-seabreeze doesn't (2019)
-        np.weigthed
         global spectra_average
         spectra_average = self.spec_avg_entry.get()
         if spectra_average.isdigit():
-            spectra_average = int(float(spectra_average))
+
+            # spectra_average = int(spectra_average)
+            spec.scans_to_average(int(spectra_average))
+
         else:
             msg = "spectra_average must be an integer.  You tried " + str(spectra_average) + ".  Setting value to 1."
             spectra_average = 1
             self.spec_avg_entry.delete(0, "end")
-            self.spec_avg_entry.insert(0, spectra_average)  # set text in averages box
-            #popupmsg(msg)
+            self.spec_avg_entry.insert(0, spectra_average)
+
+            # self.spec_avg_entry.delete(0, "end")
+            # self.insert(0, spectra_average)
+            # popupmsg(msg)
 
     def validate_xmax(self, event):
         """ Validates max wavelength to show in graph """
@@ -426,7 +431,7 @@ class DataRecording(tk.Frame):
                     xmax_temp) + " nm."
                 self.entryxmax.delete(0, 'end')
                 self.entryxmax.insert(0, xmax)  # set text in box
-                #popupmsg(msg)
+                # popupmsg(msg)
         except:
             self.entryxmax.delete(0, 'end')
             self.entryxmax.insert(0, xmax)  # set text in box to unchanged value
@@ -449,7 +454,7 @@ class DataRecording(tk.Frame):
                     xmin_temp) + " nm."
                 self.xmin_entry.delete(0, 'end')
                 self.xmin_entry.insert(0, xmin)  # set text in box
-                #popupmsg(msg)
+                # popupmsg(msg)
         except:
             self.xmin_entry.delete(0, 'end')
             self.xmin_entry.insert(0, xmin)  # set text in box to unchanged value
@@ -460,8 +465,8 @@ class DataRecording(tk.Frame):
         then conditionally processes the received data """
 
         with open("demo.csv", "w", newline='') as towrite:
-            lineWriter = csv.writer(towrite, quotechar = '|', delimiter='\n', quoting=csv.QUOTE_NONE)
-            lineWriter.writerow(self.x)
+            lineWriter = csv.writer(towrite, quotechar='|', delimiter='\n', quoting=csv.QUOTE_NONE)
+            lineWriter.writerow(self.data)
 
         self.data = spec.intensities()
         self.data = np.array(self.data, dtype=float)
@@ -469,7 +474,8 @@ class DataRecording(tk.Frame):
         monitor = np.round(self.data[monitor_index], decimals=3)
         self.text.set_text(monitor)
         return self.line,
-    #endregion
+    # endregion
+
 
 fig, ax = plt.subplots()
 app = Controller(ax)
