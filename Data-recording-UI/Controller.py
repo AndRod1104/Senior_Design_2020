@@ -1,19 +1,17 @@
-# import seatease.spectrometers as s  # Emulator to test w/o spectrometer
-import seabreeze.spectrometers as s
+import seatease.spectrometers as s  # Emulator to test w/o spectrometer
+# import seabreeze.spectrometers as s
 
-from SignUp import *
-from ResetPW import *
-from LogPatient import *
-import tkinter as tk
 from datetime import datetime
-from Design import *
-from tkinter import ttk
-import HelperMethods as hm
-import numpy as np
 from tkinter.messagebox import showerror
-import matplotlib
 
-matplotlib.use("TkAgg")
+import matplotlib
+import numpy as np
+
+from LogPatient import *
+from LoginPage import *
+from ResetPW import *
+from SignUp import *
+
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
@@ -21,10 +19,10 @@ import matplotlib.animation as animation
 from matplotlib import style
 
 from azure.storage.blob import BlobClient
-
-style.use("ggplot")
-
 import csv
+
+matplotlib.use("TkAgg")
+style.use("ggplot")
 
 dev_list = s.list_devices()
 spec = s.Spectrometer(dev_list[0])  # Assign detected spectrometer to variable spec
@@ -37,7 +35,7 @@ xmin = np.around(min(x), decimals=2)
 xmax = np.around(max(x), decimals=2)
 ymin = np.around(min(data), decimals=2)
 ymax = np.around(max(data), decimals=2)
-minIntTime = spec.minimum_integration_time_micros
+# minIntTime = spec.minimum_integration_time_micros
 
 
 class Controller(tk.Tk):

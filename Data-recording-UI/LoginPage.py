@@ -7,7 +7,6 @@ from PIL import Image, ImageTk
 
 import Connection as conn
 import HelperMethods as hm
-from Design import *
 
 
 class LoginPage(tk.Frame):
@@ -18,7 +17,7 @@ class LoginPage(tk.Frame):
         password_bullets = "\u2022"  # Bullet points for password security
 
         # region Design
-        welcome_label = ttk.Label(self, text="Welcome to the BMI reading Platform", font=LARGE_FONT)
+        welcome_label = ttk.Label(self, text="Welcome to the BMI reading Platform", font=hm.LARGE_FONT)
         welcome_label.pack(pady=10, padx=10)
 
         # Picture for paths up
@@ -28,14 +27,14 @@ class LoginPage(tk.Frame):
         paws_up_image_label.pack()
 
         # Email Label and entry box
-        email_label = ttk.Label(self, text="Email *", font=SMALL_FONT)
+        email_label = ttk.Label(self, text="Email *", font=hm.SMALL_FONT)
         email_label.pack(pady=10, padx=10)
         email_entry = ttk.Entry(self)
         email_entry.insert(0, "user@yahoo.com")  # 2TEST ERASE!!!
         email_entry.pack()
 
         # Password label and entry box
-        password_label = ttk.Label(self, text="Password *", font=SMALL_FONT)
+        password_label = ttk.Label(self, text="Password *", font=hm.SMALL_FONT)
         password_label.pack(pady=10, padx=10)
         password_entry = ttk.Entry(self, show=password_bullets)
         password_entry.insert(0, "user")   # 2TEST ERASE!!!
@@ -53,10 +52,10 @@ class LoginPage(tk.Frame):
         forgot_password_button = ttk.Button(self, text="Forgot Password",
                                             command=lambda: controller.show_resetPW_frame())
         forgot_password_button.pack(pady=20, padx=10)
-
         # endregion
 
         def check_credentials():
+            """ Validates email and password when logging into the database """
             if hm.check_fields_inputs(emailEntry=email_entry,
                                       passwordEntry=password_entry,
                                       checkEmailFormat=email_entry.get()):

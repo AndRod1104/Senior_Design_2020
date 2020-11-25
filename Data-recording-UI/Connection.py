@@ -68,7 +68,6 @@ def email_exist(an_email):
     return False
 
 
-
 def close():
     """ Close connection to Azure database. Must be called at the end """
     cursor.close()

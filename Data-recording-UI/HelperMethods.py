@@ -1,6 +1,11 @@
 import re
 from tkinter.messagebox import showerror
 
+# Fonts
+LARGE_FONT = ("Verdana", 18)
+MEDIUM_FONT = ("Verdana", 14)
+SMALL_FONT = ("Verdana", 12)
+
 # region Min-Max values
 MIN_AGE = 17
 MAX_AGE = 100
