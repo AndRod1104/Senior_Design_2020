@@ -48,7 +48,6 @@ class LogPatient(tk.Frame):
         self.gender_option_selected.set(hm.Gender[0])  # Initial value
         gender_options = ttk.OptionMenu(self, self.gender_option_selected, *hm.Gender)
         gender_options.grid(row=6, column=1)
-        print(f'This is gender first value: {self.gender_option_selected}')
 
         weight_label = ttk.Label(self, text="Weight:", font=SMALL_FONT)
         weight_label.grid(row=8, column=0, padx=10, pady=10)

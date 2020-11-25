@@ -20,6 +20,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import style
 
+from azure.storage.blob import BlobClient
+
 style.use("ggplot")
 
 import csv
@@ -199,6 +201,10 @@ class DataRecording(tk.Frame):
                                          command=lambda: controller.show_patientLog_frame())
         diff_patient_button.pack(side='top', pady=10)
 
+        quit_button = tk.Button(self.frame1, text="Quit")
+        quit_button.pack(side='bottom', pady=10)
+        quit_button.bind('<ButtonRelease-1>', self.quit_app)
+
         log_out_button = tk.Button(self.frame1, text="Log out", command=lambda: controller.show_login_frame())
         log_out_button.pack(side='bottom', pady=10)
 
@@ -227,9 +233,22 @@ class DataRecording(tk.Frame):
         def box_toggled():
             self.session_interrupt *= -1
 
+        def save_csv_to_cloud(file_path):
+            """ Upload csv file to Azure """
+            blob = BlobClient.from_connection_string(conn_str="DefaultEndpointsProtocol=https;AccountName=rawdatasp"
+                                                              ";AccountKey"
+                                                              "=ERlbwQPEtJizmGSbHVUZbC7DxB3hECChkICuiIRvCraOhfN9v"
+                                                              "fna9aao3+anNZG3VfhpifZhSV71euAVwwURvQ==;"
+                                                              "EndpointSuffix=core.windows.net",
+                                                     container_name="blobcont",
+                                                     blob_name=file_path)
+            with open(file_path, "rb") as up:
+                blob.upload_blob(up)
+
         def save_recording():
             if self.session_interrupt == -1:
                 print("Normal session")
+                save_csv_to_cloud("demo.csv")
             else:
                 # TODO: Message box will probably have to be a customized pop-up. You can't add an entry text field here
                 result = tk.messagebox.askyesno("Interrupted session", "You have marked this session as interrupted.\n"
@@ -359,6 +378,11 @@ class DataRecording(tk.Frame):
             # Triggering the start of the counter.
             count()
         # endregion
+
+    def quit_app(root, event):
+        """ Quits the program """
+        root.destroy()
+        exit()
 
     # region Graph and connection to Pi
     def set_entry_config(self):
