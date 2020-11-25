@@ -10,7 +10,8 @@ class LogPatient(tk.Frame):
     bmi = 0.0
     age_value = 0
     weight_value = 0
-    height_value = 0
+    height_value_ft = 0
+    height_value_in = 0
     skin_color_type = ""
     ethnicity_option_selected = ""
     gender_option_selected = ""
@@ -36,7 +37,7 @@ class LogPatient(tk.Frame):
 
         age_label = ttk.Label(self, text="Age:", font=hm.SMALL_FONT)
         age_label.grid(row=4, column=0, padx=10, pady=10)
-        age_entry = ttk.Entry(self)
+        age_entry = ttk.Entry(self, )
         age_entry.insert(0, 30)  # 2TEST ERASE!!!
         age_entry.grid(row=4, column=1)
 
@@ -57,9 +58,17 @@ class LogPatient(tk.Frame):
 
         height_label = ttk.Label(self, text="Height:", font=hm.SMALL_FONT)
         height_label.grid(row=10, column=0, padx=10, pady=10)
-        height_entry = ttk.Entry(self)
-        height_entry.insert(0, 5.1)  # 2TEST ERASE!!!
-        height_entry.grid(row=10, column=1)
+        height_entry_ft = ttk.Entry(self)
+        height_entry_ft.insert(0, 6)  # 2TEST ERASE!!!
+        height_entry_ft.grid(row=10, column=1, padx=2)
+        weight_label_unit = ttk.Label(self, text="Ft", font=hm.SMALL_FONT)
+        weight_label_unit.grid(row=10, column=2, padx=10, pady=10)
+
+        height_entry_in = ttk.Entry(self)
+        height_entry_in.insert(0, 1)  # 2TEST ERASE!!!
+        height_entry_in.grid(row=10, column=3)
+        weight_label_unit = ttk.Label(self, text="In", font=hm.SMALL_FONT)
+        weight_label_unit.grid(row=10, column=4, padx=10, pady=10)
 
         ethnicity_label = ttk.Label(self, text="Ethnicity:", font=hm.SMALL_FONT)
         ethnicity_label.grid(row=12, column=0, padx=10, pady=10)
@@ -79,23 +88,40 @@ class LogPatient(tk.Frame):
         save_button.grid(row=26, column=1, padx=10, pady=30)
         # endregion
 
-        def update_bmi(height, weight, CONSTANT = 703.0):
+        def update_bmi(height_ft, height_in, weight, CONSTANT = 703.0):
             """ Method to calculate BMI """
-            height = height * 12.0
+            height = float((height_ft * 12.0) + height_in)
             if weight > 0.0 and height > 0.0:
                 bmi = (weight / (height ** 2)) * CONSTANT
                 return round(bmi, 1)
             else:
                 return 0.0
 
+        def compose_height(ft, inch):
+            """ Composed the exact height by getting feet and inches. Merges them into a float number. Fixes errors
+             such as 5.1 and 5.10 """
+            decimal = float(inch)
+            num = float(ft)
+            if inch > 9:
+                decimal = (decimal / 100)
+                height = format(num + decimal, '.2f')
+                return height
+            else:
+                decimal = float(self.height_value_in) / 10
+                height = num + decimal
+                return height
+
         def save_and_go_to_recording_page():
             """ Gets data input in the fields and saves it to subject table in database. This happens only
             if all fields pass validation in get_value() method """
             if get_values():
-                self.bmi = update_bmi(self.height_value, float(self.weight_value))
+                # Call method to get bmi given height and weight
+                self.bmi = update_bmi(self.height_value_ft, self.height_value_in, float(self.weight_value))
+                # Call method to get accurate height value
+                height_value = compose_height(self.height_value_ft, self.height_value_in)
                 # Save patient to database in azure
                 conn.insert(conn.subject, hm.current_researcher, self.age_value, self.weight_value,
-                            self.height_value, self.bmi, self.ethnicity_option_selected.get(),
+                            height_value, self.bmi, self.ethnicity_option_selected.get(),
                             self.skin_color_type.get(), self.gender_option_selected.get())
                 # move to recording page
                 controller.show_dataRecording_frame()
@@ -108,14 +134,16 @@ class LogPatient(tk.Frame):
             """ Validates all fields in LogPatient frame for correct input """
             if hm.check_fields_inputs(
                     ageEntry=age_entry,
-                    heightEntry=height_entry,
+                    heightEntryFt=height_entry_ft,
+                    heightEntryIn=height_entry_in,
                     weightEntry=weight_entry,
                     ethnicityOption=self.ethnicity_option_selected.get(),
                     genderOption=self.gender_option_selected.get(),
                     skinColorOption=self.skin_color_type.get()):
 
                 self.age_value = int(age_entry.get())
-                self.height_value = float(height_entry.get())
+                self.height_value_ft = int(height_entry_ft.get())
+                self.height_value_in = int(height_entry_in.get())
                 self.weight_value = int(weight_entry.get())
                 return True
             else:

@@ -203,6 +203,10 @@ class DataRecording(tk.Frame):
         quit_button.pack(side='bottom', pady=10)
         quit_button.bind('<ButtonRelease-1>', self.quit_app)
 
+        button_reset_y = tk.Button(self.frame1, text='Reset Y axis scale')
+        button_reset_y.pack(side='bottom', pady=10)
+        button_reset_y.bind('<ButtonRelease-1>', self.reset_y)
+
         log_out_button = tk.Button(self.frame1, text="Log out", command=lambda: controller.show_login_frame())
         log_out_button.pack(side='bottom', pady=10)
 
@@ -221,11 +225,10 @@ class DataRecording(tk.Frame):
         canvas = FigureCanvasTkAgg(fig, self)
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
-        # Blue line in on the graph
         monitor_index = np.searchsorted(x, monitor_wave, side='left')
         monitor = np.round(self.data[monitor_index], decimals=3)
         self.text = self.ax.text(0.9, 0.9, monitor, transform=ax.transAxes, fontsize=14)
-        self.ax.axvline(x=monitor_wave, lw=2, color='blue', alpha=0.5)
+        #self.ax.axvline(x=monitor_wave, lw=2, color='blue', alpha=0.5)                 # Blue line in on the graph
 
         # This method changes a value when checkBox is checked meaning a session was interrupted
         def box_toggled():
@@ -381,6 +384,12 @@ class DataRecording(tk.Frame):
         """ Quits the program """
         root.destroy()
         exit()
+
+    def reset_y(self, event):
+        data = spec.intensities(correct_dark_counts=True, correct_nonlinearity=False)
+        ymin = min(data)
+        ymax = max(data)
+        ax.set_ylim(ymin * 0.9, ymax * 1.1)
 
     # region Graph and connection to Pi
     def set_entry_config(self):
