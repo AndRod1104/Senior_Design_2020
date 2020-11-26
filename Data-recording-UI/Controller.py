@@ -139,12 +139,21 @@ class DataRecording(tk.Frame):
         self.frame3 = tk.Frame(self)
         self.frame3.pack(side='left', anchor=tk.N)
 
+        # ID design
         id_label = tk.Label(self.frame1, text="Patient ID:", font=SMALL_FONT)
         id_label.pack(side='top', pady=4)
         id_val = tk.Label(self.frame2, text=LogPatient.patient_id, font=SMALL_FONT)
         id_val.pack(side='top', pady=4)
         filler_label = tk.Label(self.frame3, text="")
         filler_label.pack(side='top')
+
+        # BMI design
+        bmi_label = tk.Label(self.frame1, text="BMI:", font=SMALL_FONT)
+        bmi_label.pack(side='top', pady=4)
+        bmi_val = tk.Label(self.frame2, text="auto", font=SMALL_FONT)
+        bmi_val.pack(side='top', pady=4)
+        filler_label = tk.Label(self.frame3, text="")
+        filler_label.pack(side='top', pady=6)
 
         # Integration time design
         duration_label = tk.Label(self.frame1, text="Integration Time", font=SMALL_FONT)
@@ -155,19 +164,25 @@ class DataRecording(tk.Frame):
         seconds_label.pack(side='top', pady=4)
         self.duration_entry.bind('<Return>', self.validate_integration_time)
 
+        # Number of spectra design
+        num_spectra_label = tk.Label(self.frame1, text="Number of Spectra", font=SMALL_FONT)
+        num_spectra_label.pack(side='top', pady=4)
+        num_spectra_entry = tk.Entry(self.frame2, width='7', justify='right')
+        num_spectra_entry.pack(side='top', pady=10)
+
         # Amount of spectra to average design
         spec_avg_label = tk.Label(self.frame1, text='Amount of Spectra to Average', width='20', wraplength='150',
                                   font=SMALL_FONT)
         spec_avg_label.pack(side='top', pady=4)
         self.spec_avg_entry = tk.Entry(self.frame2, width='7', justify='right')
-        self.spec_avg_entry.pack(side='top', pady=2)
+        self.spec_avg_entry.pack(side='top', pady=20)
         self.spec_avg_entry.bind('<Return>', self.validate_spec_avg)
 
         # Minimum wavelength label and entry field
         xmin_label = tk.Label(self.frame1, text='Minimum wavelength', font=SMALL_FONT)
         xmin_label.pack(side='top', pady=2)
         self.xmin_entry = tk.Entry(self.frame2, width='7', justify='right')
-        self.xmin_entry.pack(side='top', pady=2)
+        self.xmin_entry.pack(side='top', pady=15)
         self.xmin_entry.insert(0, xmin)  # AUTO INPUTS VALUE
         self.xmin_entry.bind('<Return>', self.validate_xmin)
 
@@ -175,7 +190,7 @@ class DataRecording(tk.Frame):
         xmax_label = tk.Label(self.frame1, text='Maximum wavelength', height='2', font=SMALL_FONT)
         xmax_label.pack(side='top', pady=2)
         self.entryxmax = tk.Entry(self.frame2, width='7', justify='right')
-        self.entryxmax.pack(side='top', pady=2)
+        self.entryxmax.pack(side='top', pady=5)
         self.entryxmax.insert(0, xmax)  # AUTO INPUTS VALUE
         self.entryxmax.bind('<Return>', self.validate_xmax)
 
@@ -184,7 +199,7 @@ class DataRecording(tk.Frame):
         self.body_part_option_selected = tk.StringVar()
         self.body_part_option_selected.set(hm.BodyParts[0])  # Initial Value
         body_part_options = ttk.OptionMenu(self.frame2, self.body_part_option_selected, *hm.BodyParts)
-        body_part_options.pack(side='top', pady=4)
+        body_part_options.pack(side='top', pady=15)
 
         btn_start_stop = ttk.Button(self.frame1, text="Start", command=lambda: start_stop_process())
         btn_start_stop.pack(side='top', pady=10)
