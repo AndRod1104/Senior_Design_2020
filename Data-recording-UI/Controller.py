@@ -406,7 +406,7 @@ class DataRecording(tk.Frame):
         data = spec.intensities(correct_dark_counts=True, correct_nonlinearity=False)
         ymin = min(data)
         ymax = max(data)
-        ax.set_ylim(ymin * 0.9, ymax * 1.1)
+        ax.set_ylim(ymin * 0.0, ymax * 2.1)
 
     # region Graph and connection to Pi
     def set_entry_config(self):
