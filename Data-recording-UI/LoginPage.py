@@ -30,14 +30,14 @@ class LoginPage(tk.Frame):
         email_label = ttk.Label(self, text="Email *", font=hm.SMALL_FONT)
         email_label.pack(pady=10, padx=10)
         email_entry = ttk.Entry(self)
-        email_entry.insert(0, "user@yahoo.com")  # 2TEST ERASE!!!
+        # email_entry.insert(0, "user@yahoo.com")  # 2TEST ERASE!!!
         email_entry.pack()
 
         # Password label and entry box
         password_label = ttk.Label(self, text="Password *", font=hm.SMALL_FONT)
         password_label.pack(pady=10, padx=10)
         password_entry = ttk.Entry(self, show=password_bullets)
-        password_entry.insert(0, "user")   # 2TEST ERASE!!!
+        # password_entry.insert(0, "user")   # 2TEST ERASE!!!
         password_entry.pack()
 
         # Login Button
