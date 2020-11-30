@@ -165,13 +165,13 @@ class DataRecording(tk.Frame):
         self.duration_entry.bind('<Return>', self.validate_integration_time)
 
         # Number of spectra design
-        num_spectra_label = tk.Label(self.frame1, text="Number of Spectra", font=SMALL_FONT)
+        num_spectra_label = tk.Label(self.frame1, text="Number of Spectra Returned", font=SMALL_FONT)
         num_spectra_label.pack(side='top', pady=4)
         num_spectra_entry = tk.Entry(self.frame2, width='7', justify='right')
         num_spectra_entry.pack(side='top', pady=10)
 
         # Amount of spectra to average design
-        spec_avg_label = tk.Label(self.frame1, text='Amount of Spectra to Average', width='20', wraplength='150',
+        spec_avg_label = tk.Label(self.frame1, text='Amount of Spectra to Average ', width='20', wraplength='150',
                                   font=SMALL_FONT)
         spec_avg_label.pack(side='top', pady=4)
         self.spec_avg_entry = tk.Entry(self.frame2, width='7', justify='right')
@@ -264,7 +264,9 @@ class DataRecording(tk.Frame):
         def save_recording():
             if self.session_interrupt == -1:
                 print("Normal session")
-                save_csv_to_cloud("demo.csv")
+                file_name = str(LogPatient.patient_id) + "_" + str(self.body_part_option_selected.get()) + ".csv"
+                print(file_name)
+                save_csv_to_cloud(file_name)
             else:
                 # TODO: Message box will probably have to be a customized pop-up. You can't add an entry text field here
                 result = tk.messagebox.askyesno("Interrupted session", "You have marked this session as interrupted.\n"
@@ -509,8 +511,8 @@ class DataRecording(tk.Frame):
         """ This function manages the update of the
         spectral data in the graph. It issues a read request to the spectrometer,
         then conditionally processes the received data """
-
-        with open("demo.csv", "w", newline='') as towrite:
+        file_name = str(LogPatient.patient_id) + "_" + str(self.body_part_option_selected.get()) + ".csv"
+        with open(file_name, "w", newline='') as towrite:
             lineWriter = csv.writer(towrite, quotechar='|', delimiter='\n', quoting=csv.QUOTE_NONE)
             lineWriter.writerow(self.data)
 

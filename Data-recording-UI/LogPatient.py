@@ -15,7 +15,6 @@ class LogPatient(tk.Frame):
     skin_color_type = ""
     ethnicity_option_selected = ""
     gender_option_selected = ""
-    duration_value = 0
     patient_id = 1
     id_list = conn.multi_select('subject_id', conn.subject)     # Initialize list with all subjects' ids
 
