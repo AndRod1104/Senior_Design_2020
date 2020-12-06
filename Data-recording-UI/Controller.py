@@ -251,12 +251,12 @@ class DataRecording(tk.Frame):
 
         def save_csv_to_cloud(file_path):
             """ Upload csv file to Azure """
-            blob = BlobClient.from_connection_string(conn_str="DefaultEndpointsProtocol=https;AccountName=rawdatasp"
-                                                              ";AccountKey"
-                                                              "=ERlbwQPEtJizmGSbHVUZbC7DxB3hECChkICuiIRvCraOhfN9v"
-                                                              "fna9aao3+anNZG3VfhpifZhSV71euAVwwURvQ==;"
+            blob = BlobClient.from_connection_string(conn_str="DefaultEndpointsProtocol=https;"
+                                                              "AccountName=rawspectrastorage;"
+                                                              "AccountKey=R9LoQ0g8bxhSVI3b2r9+akl0QxPjjtwJYBnOVFbxSTos"
+                                                              "DjxrB4Ribc6sk4R6gl42iIrEGOYVUBxdEed8G8R5bQ==;"
                                                               "EndpointSuffix=core.windows.net",
-                                                     container_name="blobcont",
+                                                     container_name="raw-spectra-container",
                                                      blob_name=file_path)
             with open(file_path, "rb") as up:
                 blob.upload_blob(up)
@@ -512,9 +512,11 @@ class DataRecording(tk.Frame):
         spectral data in the graph. It issues a read request to the spectrometer,
         then conditionally processes the received data """
         file_name = str(LogPatient.patient_id) + "_" + str(self.body_part_option_selected.get()) + ".csv"
-        with open(file_name, "w", newline='') as towrite:
-            lineWriter = csv.writer(towrite, quotechar='|', delimiter='\n', quoting=csv.QUOTE_NONE)
-            lineWriter.writerow(self.data)
+        not2save = str(LogPatient.patient_id) + "_Select an option.csv"
+        if file_name != not2save:
+            with open(file_name, "w", newline='') as towrite:
+                lineWriter = csv.writer(towrite, quotechar='|', delimiter='\n', quoting=csv.QUOTE_NONE)
+                lineWriter.writerow(self.data)
 
         self.data = spec.intensities()
         self.data = np.array(self.data, dtype=float)
