@@ -112,7 +112,7 @@ The graphical user interface makes pretty easy the interaction.
 
 * The "ResetPassword" page (functionality needs to be implemented) allows to recover password if forgotten, after it authenticates that user's email exists in the database. The plan is to send a unique link for them to reset the password.
 <p align="center">
-    <img src="Data-recording-UI/images/SignUp.png" alt="Logo" width="620" height="450">
+    <img src="Data-recording-UI/images/ResetPW.png" alt="Logo" width="620" height="450">
 <p align="center">
 
 * The "LogPatient" page allows to gather biographical and physical information of the patient. Right before to continue to the next page patient's bmi is calculated and all this information is uploaded to database hosted in Azure.
