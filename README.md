@@ -114,16 +114,17 @@ The graphical user interface makes pretty easy the interaction.
 
 * The "ResetPassword"
 <p align="center">
-    <img src="Data-recording-UI/images/LogPatient.png" alt="Logo" width="620" height="450">
+    <img src="Data-recording-UI/images/SignUp.png" alt="Logo" width="620" height="450">
 <p align="center">
 
 * The "LogPatient"
-    <img src="Data-recording-UI/images/DataRecord.png" alt="Logo" width="620" height="450">
+<p align="center">
+    <img src="Data-recording-UI/images/LogPatient.png" alt="Logo" width="620" height="450">
 <p align="center">
 
 * The "DataRecording"
 <p align="center">
-    <img src="Data-recording-UI/images/SignUp.png" alt="Logo" width="620" height="450">
+    <img src="Data-recording-UI/images/DataRecord.png" alt="Logo" width="620" height="450">
 <p align="center">
 
 
