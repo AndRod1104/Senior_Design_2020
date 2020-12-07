@@ -138,8 +138,8 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Alex Pastoriza - <apast005@fiu.edu>.
-Gustavo Cordido - <gcord018@fiu.edu> 
+Alex Pastoriza - <apast005@fiu.edu> <br>
+Gustavo Cordido - <gcord018@fiu.edu> <br>
 Jose Bello - <jbell139@fiu.edu> 
 Idiel Guerra - <iguer034@fiu.edu> 
 Robert Rodriguez - <rrodr630@fiu.edu> 
