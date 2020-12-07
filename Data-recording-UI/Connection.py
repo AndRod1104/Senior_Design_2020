@@ -6,10 +6,10 @@ researcher = 'researcher'
 data = 'processed_data'
 
 # Update connection string information
-host = "obesity-wearable-tech-server.postgres.database.azure.com"
-dbname = "obesity_wearable_db"
-user = "pathsup@obesity-wearable-tech-server"
-password = "Innovation2020"
+host = "Azure host name Place Holder"
+dbname = "Database name Place Holder"
+user = "User name from Azure Place Holder"
+password = "Password Place Holder"
 sslmode = "require"
 
 # Construct connection string

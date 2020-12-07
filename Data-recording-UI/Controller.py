@@ -84,7 +84,6 @@ class Controller(tk.Tk):
     def show_resetPW_frame(self):
         frame = self.frames["ResetPW"]
         frame.tkraise()
-    # endregion
 
 
 class DataRecording(tk.Frame):
@@ -247,12 +246,8 @@ class DataRecording(tk.Frame):
 
         def save_csv_to_cloud(file_path):
             """ Upload csv file to Azure """
-            blob = BlobClient.from_connection_string(conn_str="DefaultEndpointsProtocol=https;"
-                                                              "AccountName=rawspectrastorage;"
-                                                              "AccountKey=R9LoQ0g8bxhSVI3b2r9+akl0QxPjjtwJYBnOVFbxSTos"
-                                                              "DjxrB4Ribc6sk4R6gl42iIrEGOYVUBxdEed8G8R5bQ==;"
-                                                              "EndpointSuffix=core.windows.net",
-                                                     container_name="raw-spectra-container",
+            blob = BlobClient.from_connection_string(conn_str="Connection String Place Holder",
+                                                     container_name="Container Name Place Holder",
                                                      blob_name=file_path)
             with open(file_path, "rb") as up:
                 blob.upload_blob(up)
@@ -391,7 +386,6 @@ class DataRecording(tk.Frame):
 
             # Triggering the start of the counter.
             count()
-        # endregion
 
     def quit_app(root, event):
         """ Quits the program """
@@ -404,7 +398,6 @@ class DataRecording(tk.Frame):
         ymax = max(data)
         ax.set_ylim(ymin * 0.9, ymax * 1.1)
 
-    # region Graph and connection to Pi
     def set_entry_config(self):
         """ This function handles new inputs on the text fields and it send values to spectrometer """
         global integration_time  # , spectra_average
@@ -424,27 +417,21 @@ class DataRecording(tk.Frame):
             if int(int_time_temp) > 65000:
                 msg = "The integration time must be 65000 ms or smaller.  You set " + int_time_temp
                 self.set_entry_config()
-                # popupmsg(msg)
             elif int(int_time_temp) < 4:
                 msg = "The integration time must be greater than 4 ms.  You set " + int_time_temp
                 self.set_entry_config()
-                # popupmsg(msg)
             else:
                 integration_time = int(int_time_temp) * 1000  # convert ms to microseconds
                 self.set_entry_config()
         else:
             msg = "Integration time must be an integer between 4 and 65000 ms.  You set " + str(int_time_temp)
             self.set_entry_config()
-            # popupmsg(msg)
 
     def validate_spec_avg(self, event):
-        ## averaging needs to be implemented here in code
-        #  cseabreeze has average working, but python-seabreeze doesn't (2019)
+        # averaging needs to be implemented here in code
         global spectra_average
         spectra_average = self.spec_avg_entry.get()
         if spectra_average.isdigit():
-
-            # spectra_average = int(spectra_average)
             spec.scans_to_average(int(spectra_average))
 
         else:
@@ -452,10 +439,6 @@ class DataRecording(tk.Frame):
             spectra_average = 1
             self.spec_avg_entry.delete(0, "end")
             self.spec_avg_entry.insert(0, spectra_average)
-
-            # self.spec_avg_entry.delete(0, "end")
-            # self.insert(0, spectra_average)
-            # popupmsg(msg)
 
     def validate_xmax(self, event):
         """ Validates max wavelength to show in graph """
@@ -475,7 +458,6 @@ class DataRecording(tk.Frame):
                     xmax_temp) + " nm."
                 self.entryxmax.delete(0, 'end')
                 self.entryxmax.insert(0, xmax)  # set text in box
-                # popupmsg(msg)
         except:
             self.entryxmax.delete(0, 'end')
             self.entryxmax.insert(0, xmax)  # set text in box to unchanged value
@@ -498,7 +480,6 @@ class DataRecording(tk.Frame):
                     xmin_temp) + " nm."
                 self.xmin_entry.delete(0, 'end')
                 self.xmin_entry.insert(0, xmin)  # set text in box
-                # popupmsg(msg)
         except:
             self.xmin_entry.delete(0, 'end')
             self.xmin_entry.insert(0, xmin)  # set text in box to unchanged value
