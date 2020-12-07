@@ -92,7 +92,8 @@ For more information about this library [click here](https://github.com/ap--/pyt
 ```sh
 git clone https://github.com/CPRGB/Senior_Design_2020.git
 ```
-2. CONTINUE...
+_Click here for more detailed installation
+
 
 
 <!-- USAGE EXAMPLES -->
@@ -110,59 +111,20 @@ The graphical user interface makes pretty easy the interaction.
     <img src="Data-recording-UI/images/SignUp.png" alt="Logo" width="620" height="450">
 <p align="center">
 
-* The "ResetPassword"
+* The "ResetPassword" page (functionality needs to be implemented) allows to recover password if forgotten, after it authenticates that user's email exists in the database. The plan is to send a unique link for them to reset the password.
 <p align="center">
     <img src="Data-recording-UI/images/SignUp.png" alt="Logo" width="620" height="450">
 <p align="center">
 
-* The "LogPatient"
+* The "LogPatient" page allows to gather biographical and physical information of the patient. Right before to continue to the next page patient's bmi is calculated and all this information is uploaded to database hosted in Azure.
 <p align="center">
     <img src="Data-recording-UI/images/LogPatient.png" alt="Logo" width="620" height="450">
 <p align="center">
 
-* The "DataRecording"
+* The "DataRecording" page is where all the spectra is gather from different parts of the body. This page allows researcher to set integration time as well as amount of spectra to average. The information gathered will be saved as raw data into .csv files and uploaded to Azure storage account referencing the database by having as name "Patient_ID" underscore "Body_Location" .csv for example "123_Arm.csv"
 <p align="center">
     <img src="Data-recording-UI/images/DataRecord.png" alt="Logo" width="620" height="450">
 <p align="center">
-
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-
-
-<!-- ROADMAP -->
-## Roadmap
-1. Increase Usability      
-    - [X] Download the appropriate components from GitHub and produce useful messages and/or log files for users as appropriate.  
-    - [ ] Outputs of these test benches also should be displayed in the terminal or into log files in ways that make sense
-    - [ ] A user should be able to turn interactive mode on or off (for
-              * Example:  Windows users executing these test benches over Putty
-
-2. Automate component integration/testing
-    - [X] Automate this process through scripts that could process these dependency files and check if dependencies have been installed
-    - [ ] Test benches for components should be automatically executed upon installation to validate a working component.
-
-3. Documentation is in PDF table that specifies the module name, dependencies, inputs, outputs, and an English description of the component.  
-    - [ ] Alternative environment for documentation like Unix “man” pages.
-
-4. See the [open issues](https://github.com/apast005/QMS/issues) for a list of proposed features (and known issues).
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-This is my first time trying Shell Scripting to automate a task.  Any feedback/suggestions is greatly appreciated and I thank you for taking the time
-to help me grow and provide a contribution to the open source community.
-
-Below is a template from a README template I used that is listed in Acknowledgments
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 
 
@@ -176,9 +138,11 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Alex Pastoriza - apast005@fiu.edu
-
-Project Link: [https://github.com/apast005/QMS](https://github.com/apast005/QMS)
+Alex Pastoriza - <apast005@fiu.edu>
+Gustavo Cordido - <gcord018@fiu.edu>
+Jose Bello - <jbell139@fiu.edu>
+Idiel Guerra - <iguer034@fiu.edu>
+Robert Rodriguez - <rrodr630@fiu.edu>
 
 
 
