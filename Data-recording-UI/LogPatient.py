@@ -25,7 +25,6 @@ class LogPatient(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        # region Design
         label = ttk.Label(self, text="Patient's Info", font=hm.LARGE_FONT)
         label.grid(row=0, column=1, padx=0, pady=10)
 
@@ -37,7 +36,6 @@ class LogPatient(tk.Frame):
         age_label = ttk.Label(self, text="Age:", font=hm.SMALL_FONT)
         age_label.grid(row=4, column=0, padx=10, pady=10)
         age_entry = ttk.Entry(self, )
-        # age_entry.insert(0, 30)  # 2TEST ERASE!!!
         age_entry.grid(row=4, column=1)
 
         gender_label = ttk.Label(self, text="Sex:", font=hm.SMALL_FONT)
@@ -50,7 +48,6 @@ class LogPatient(tk.Frame):
         weight_label = ttk.Label(self, text="Weight:", font=hm.SMALL_FONT)
         weight_label.grid(row=8, column=0, padx=10, pady=10)
         weight_entry = ttk.Entry(self)
-        # weight_entry.insert(0, 130)  # 2TEST ERASE!!!
         weight_entry.grid(row=8, column=1)
         weight_label_unit = ttk.Label(self, text="Lb", font=hm.SMALL_FONT)
         weight_label_unit.grid(row=8, column=2, padx=10, pady=10)
@@ -58,13 +55,11 @@ class LogPatient(tk.Frame):
         height_label = ttk.Label(self, text="Height:", font=hm.SMALL_FONT)
         height_label.grid(row=10, column=0, padx=10, pady=10)
         height_entry_ft = ttk.Entry(self)
-        # height_entry_ft.insert(0, 6)  # 2TEST ERASE!!!
         height_entry_ft.grid(row=10, column=1, padx=2)
         weight_label_unit = ttk.Label(self, text="Ft", font=hm.SMALL_FONT)
         weight_label_unit.grid(row=10, column=2, padx=10, pady=10)
 
         height_entry_in = ttk.Entry(self)
-        # height_entry_in.insert(0, 1)  # 2TEST ERASE!!!
         height_entry_in.grid(row=10, column=3)
         weight_label_unit = ttk.Label(self, text="In", font=hm.SMALL_FONT)
         weight_label_unit.grid(row=10, column=4, padx=10, pady=10)
@@ -85,7 +80,6 @@ class LogPatient(tk.Frame):
 
         save_button = ttk.Button(self, text="Save and Continue", command=lambda: save_and_go_to_recording_page())
         save_button.grid(row=26, column=1, padx=10, pady=30)
-        # endregion
 
         def update_bmi(height_ft, height_in, weight, CONSTANT = 703.0):
             """ Method to calculate BMI """

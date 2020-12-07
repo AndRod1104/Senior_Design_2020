@@ -19,7 +19,6 @@ class SignUp(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
-        # region Design
         welcome_label = ttk.Label(self, text="New Researcher", font=hm.LARGE_FONT)
         welcome_label.pack(pady=10)
 
@@ -64,7 +63,6 @@ class SignUp(tk.Frame):
         alreadyHaveAnAccount = ttk.Button(self, text="Already have an Account? Login",
                                           command=lambda: controller.show_login_frame())
         alreadyHaveAnAccount.pack()
-        # endregion
 
         def signUp():
             # check if fields are empty, if password match and if email is in correct format

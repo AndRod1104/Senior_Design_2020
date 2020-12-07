@@ -1,5 +1,5 @@
-import seatease.spectrometers as s  # Emulator to test w/o spectrometer
-# import seabreeze.spectrometers as s
+# import seatease.spectrometers as s  # Emulator to test w/o spectrometer
+import seabreeze.spectrometers as s
 
 from datetime import datetime
 from tkinter.messagebox import showerror
@@ -35,7 +35,7 @@ xmin = np.around(min(x), decimals=2)
 xmax = np.around(max(x), decimals=2)
 ymin = np.around(min(data), decimals=2)
 ymax = np.around(max(data), decimals=2)
-# minIntTime = spec.minimum_integration_time_micros
+minIntTime = spec.minimum_integration_time_micros
 
 
 class Controller(tk.Tk):
@@ -46,7 +46,6 @@ class Controller(tk.Tk):
 
         self.geometry("1000x700")
 
-        # region Frames
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -64,7 +63,6 @@ class Controller(tk.Tk):
 
         # Starting page
         self.show_login_frame()
-        # endregion
 
     # When called, passes the frame or page to be showed on windows
     def show_login_frame(self):
@@ -123,7 +121,6 @@ class DataRecording(tk.Frame):
 
         tk.Frame.__init__(self, parent)
 
-        # region Design
         label = ttk.Label(self, text=f"Session Recording", font=LARGE_FONT)
         label.pack(side='top', pady=20)
 
@@ -227,7 +224,6 @@ class DataRecording(tk.Frame):
 
         check_box_label = tk.Checkbutton(self.frame1, text="Interrupted session", command=lambda: box_toggled())
         check_box_label.pack(side='bottom', pady=10)
-        # endregion
 
         # Disable pause while the clock is not started
         hm.disable_fields(btn_pause_resume)
