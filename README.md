@@ -92,7 +92,7 @@ For more information about this library [click here](https://github.com/ap--/pyt
 ```sh
 git clone https://github.com/CPRGB/Senior_Design_2020.git
 ```
-_Click here for more detailed installation
+Click here for more detailed installation
 
 
 
@@ -138,11 +138,11 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Alex Pastoriza - <apast005@fiu.edu>
-Gustavo Cordido - <gcord018@fiu.edu>
-Jose Bello - <jbell139@fiu.edu>
-Idiel Guerra - <iguer034@fiu.edu>
-Robert Rodriguez - <rrodr630@fiu.edu>
+<p>Alex Pastoriza - <apast005@fiu.edu><p>
+<p>Gustavo Cordido - <gcord018@fiu.edu><p>
+<p>Jose Bello - <jbell139@fiu.edu><p>
+<p>Idiel Guerra - <iguer034@fiu.edu><p>
+<p>Robert Rodriguez - <rrodr630@fiu.edu><p>
 
 
 
