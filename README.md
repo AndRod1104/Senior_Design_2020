@@ -6,13 +6,6 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
-
 
 
 <!-- PROJECT LOGO -->
@@ -30,14 +23,9 @@
     <a href="https://github.com/CPRGB/Senior_Design_2020.git"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/apast005/QMS">View Demo</a>
-    ·
-    <a href="https://github.com/apast005/QMS/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/apast005/QMS/issues">Request Feature</a>
+    <a href="https://www.youtube.com/watch?v=jcINGjAzjmo">View Demo</a>
   </p>
 </p>
-
 
 
 <!-- TABLE OF CONTENTS -->
@@ -62,6 +50,7 @@
 ## About The Project
 
 The end goal of this project is to create wearable devices that monitor blood preasure levels and heart rate for overweight population. A user interface (UI) is being developed with different functionalities to facilitate researchers work when logging in patient's information and perform data recorderings. This UI will be running on a Raspberry Pi computer and will allow researchers to start recording sessions and save the gathered data to a database. The data recorded will be processed by an algorithm and displayed on a website accesible by multiple researchers around the world.
+
 ### Built With
 
 * [Python3]()
