@@ -92,7 +92,6 @@ For more information about this library [click here](https://github.com/ap--/pyt
 ```sh
 git clone https://github.com/CPRGB/Senior_Design_2020.git
 ```
-Click here for more detailed installation
 
 
 
@@ -140,46 +139,12 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Alex Pastoriza - <apast005@fiu.edu> <br>
 Gustavo Cordido - <gcord018@fiu.edu> <br>
-Jose Bello - <jbell139@fiu.edu> 
-Idiel Guerra - <iguer034@fiu.edu> 
+Jose Bello - <jbell139@fiu.edu> <br>
+Idiel Guerra - <iguer034@fiu.edu> <br>
 Robert Rodriguez - <rrodr630@fiu.edu> 
-
-
-
-<!-- REFERENCES -->
-## References
-
-* [Intel Installation Guide](https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/manual/quartus_install.pdf#page=12&zoom=auto,-207,693)
-* [Intel Quick Start Guide](https://fpgasoftware.intel.com/static/quick_start_guide/quick_start_guide_20.1_en.pdf)
-* [Quartus Manual](https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/manual/quartus_install.pdf)
-* [Intel Installation FAQS](https://www.intel.com/content/www/us/en/programmable/downloads/software/faq/installation-faq.html?erpm_id=8905536_ts1601556901225#_Toc361418227)
-* [Intel's Download Center](https://fpgasoftware.intel.com/20.1/?edition=lite)
-* []()
 
 
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 * [Template for README](https://github.com/othneildrew/Best-README-Template/blob/master/BLANK_README.md)
-* []()
-* []()
-
-
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/apast005/QMS.svg?style=flat-square
-[contributors-url]: https://github.com/apast005/QMS/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/apast005/QMS.svg?style=flat-square
-[forks-url]: https://github.com/apast005/QMS/network/members
-[stars-shield]: https://img.shields.io/github/stars/apast005/QMS.svg?style=flat-square
-[stars-url]: https://github.com/apast005/QMS/stargazers
-[issues-shield]: https://img.shields.io/github/issues/apast005/QMS.svg?style=flat-square
-[issues-url]: https://github.com/apast005/QMS/issues
-[license-shield]: https://img.shields.io/github/license/apast005/QMS.svg?style=flat-square
-[license-url]: https://github.com/apast005/QMS/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-blue.svg?style=flat-square&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/alexander-pastoriza
-[product-screenshot]: images/screenshot.png
