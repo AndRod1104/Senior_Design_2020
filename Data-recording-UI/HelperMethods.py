@@ -1,5 +1,11 @@
 import re
 from tkinter.messagebox import showerror
+
+# Fonts
+LARGE_FONT = ("Verdana", 18)
+MEDIUM_FONT = ("Verdana", 14)
+SMALL_FONT = ("Verdana", 12)
+
 # region Min-Max values
 MIN_AGE = 17
 MAX_AGE = 100
@@ -9,12 +15,18 @@ MAX_WEIGHT = 500
 
 # For now the concept of height is 5'10" = 5.10. Another example 6'01" = 6.01
 # ************************** CAUTION WITH 5.1 AND 5.01 may have to think of a different way ****************************
-MIN_HEIGHT = 1.00
-MAX_HEIGHT = 8.00
+MIN_HEIGHT_FT = 1
+MAX_HEIGHT_FT = 8
+MIN_HEIGHT_IN = 0
+MAX_HEIGHT_IN = 11
+
 
 # Duration is in seconds
 MIN_DURATION = 1
 MAX_DURATION = 120  # 2 min
+
+# Keeps track of the researcher logged in
+current_researcher = 0
 
 DEFAULT_SCROLLDOWNMENU_OPTION = "Select an option"
 
@@ -66,13 +78,14 @@ def isEmpty(field):
     return len(field) == 0
 
 
-def isHeightValid(height):
-    return MIN_HEIGHT < height < MAX_HEIGHT
+def isHeightValid(height_ft, height_in):
+    return MIN_HEIGHT_FT < height_ft < MAX_HEIGHT_FT and MIN_HEIGHT_IN <= height_in <= MAX_HEIGHT_IN
 
 
 def disable_fields(*fields):
     for field in fields:
         field["state"] = "disabled"
+
 
 def enable_fields(*fields):
     for field in fields:
@@ -82,11 +95,13 @@ def enable_fields(*fields):
 def isDurationValid(duration):
     return MIN_DURATION < duration < MAX_DURATION
 
+
 def correct_email_format(email):
     regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
     if re.search(regex, email):
         return True
     return False
+
 
 def is_start_button(button):
     return button["text"] == "Start"
@@ -95,8 +110,9 @@ def is_start_button(button):
 def is_pause_button(button):
     return button["text"] == "Pause"
 
+
 # checks if any errors were built, printing them and returning false. If no errors, then returns true
-def check_fields_inputs(ageEntry=None, heightEntry=None, weightEntry=None, durationEntry=None, ethnicityOption=None,
+def check_fields_inputs(ageEntry=None, heightEntryFt=None, heightEntryIn=None, weightEntry=None, durationEntry=None, ethnicityOption=None,
                         genderOption=None, skinColorOption=None, bodyPartOption=None, emailEntry=None,
                         passwordEntry=None, reEnterPasswordEntry=None, checkEmailFormat=None, fNameEntry=None,
                         middleInitialEntry=None, lNameEntry=None, instEntry=None):
@@ -112,11 +128,12 @@ def check_fields_inputs(ageEntry=None, heightEntry=None, weightEntry=None, durat
         except ValueError:
             error_message += "\u2022    " + "Value entered for age is not a number.\n"
 
-    if heightEntry is not None:
+    if heightEntryFt is not None and heightEntryIn is not None:
         try:
-            heightValue = float(heightEntry.get())
+            heightValueFt = int(heightEntryFt.get())
+            heightEntryIn = int(heightEntryIn.get())
 
-            if not isHeightValid(heightValue):
+            if not isHeightValid(heightValueFt, heightEntryIn):
                 error_message += "\u2022    " + "Number entered for height is invalid.\n"
 
         except ValueError:
@@ -134,7 +151,7 @@ def check_fields_inputs(ageEntry=None, heightEntry=None, weightEntry=None, durat
 
     if durationEntry is not None:
         try:
-            durationValue = int(durationEntry.get())
+            durationValue = float(durationEntry.get())
 
             # This was moved here, because there is no need to print this error if above already failed
             if not isDurationValid(durationValue):
@@ -200,8 +217,9 @@ def check_fields_inputs(ageEntry=None, heightEntry=None, weightEntry=None, durat
     if isEmpty(error_message):
         return True
     else:
-        showerror("Errors", "Please fix the following errors:\n" + error_message)
+        showerror("Error", "Please fix the following errors:\n" + error_message)
         return False
+
 
 def passwords_match(password, re_password):
     if password == re_password:

@@ -1,4 +1,4 @@
 #!/bin/bash
-cd ~/PiSpec20_oceanoptics-master/PiSpec20_oceanoptics/
-screen -dm python3 OO_spec.py
+cd ~/Senior_Design_2020/Senior_Design_2020/Data-recording-UI
+screen -dm python3 Controller.py
 exit

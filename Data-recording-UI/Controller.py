@@ -1,390 +1,271 @@
-import tkinter as tk
-from datetime import datetime
-from Design import *
-from tkinter import ttk, Entry
-import HelperMethods as hm
-from tkinter.messagebox import showerror
-import threading
-from PIL import Image, ImageTk
+# import seatease.spectrometers as s  # Emulator to test w/o spectrometer
+import seabreeze.spectrometers as s
 
+from datetime import datetime
+from tkinter.messagebox import showerror
+
+import matplotlib
+import numpy as np
+
+from LogPatient import *
+from LoginPage import *
+from ResetPW import *
+from SignUp import *
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.lines import Line2D
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib import style
+
+from azure.storage.blob import BlobClient
+import csv
+
+matplotlib.use("TkAgg")
+style.use("ggplot")
+
+dev_list = s.list_devices()
+spec = s.Spectrometer(dev_list[0])  # Assign detected spectrometer to variable spec
+integration_time = 20000  # 20 ms, set default integration time to a reasonable value
+spec.integration_time_micros(integration_time)
+
+x = spec.wavelengths()
+data = spec.intensities()
+xmin = np.around(min(x), decimals=2)
+xmax = np.around(max(x), decimals=2)
+ymin = np.around(min(data), decimals=2)
+ymax = np.around(max(data), decimals=2)
+minIntTime = spec.minimum_integration_time_micros
 
 
 class Controller(tk.Tk):
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, ax, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
         tk.Tk.wm_title(self, "Data Recording")
 
-        self.geometry("400x650")
+        self.geometry("1000x700")
 
-        # region Design
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
-        #endregion
 
-        #region Frames
         # Dictionary of class names, frames (Ex: HomePage, actual frame)
-        self.frames = {}
+        self.frames = {"LoginPage": LoginPage(container, self),
+                       "LogPatient": LogPatient(container, self),
+                       "DataRecording": DataRecording(container, self, ax),
+                       "SignUp": SignUp(container, self),
+                       "ResetPW": ResetPW(container, self)}
 
-        # Adds pages to the container
-        for frame in (LoginPage, LogPatient, DataRecording, SignUp, ResetPW):
-
-            # Initialize frames and save them into frames
-            tempFrame = frame(container, self)
-            self.frames[frame] = tempFrame
-
-            tempFrame.grid(row=0, column=0, sticky="nsew")
+        for frame in self.frames:
+            self.frames[frame].grid(row=0, column=0, sticky="nsew")
 
         # Starting page
-        self.show_frame(LoginPage)
-        #endregion
+        self.show_login_frame()
 
     # When called, passes the frame or page to be showed on windows
-    def show_frame(self, cont):
-        frame = self.frames[cont]
+    def show_login_frame(self):
+        frame = self.frames["LoginPage"]
         frame.tkraise()
 
+    def show_patientLog_frame(self):
+        frame = self.frames["LogPatient"]
+        frame.tkraise()
 
-class LoginPage(tk.Frame):
+    def show_dataRecording_frame(self):
+        frame = self.frames["DataRecording"]
+        frame.tkraise()
 
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
+    def show_signUp_frame(self):
+        frame = self.frames["SignUp"]
+        frame.tkraise()
 
-        password_bullets = "\u2022" # Bullet points for password security
-
-        # region Design
-        welcome_label = ttk.Label(self, text="Welcome to the BMI reading Platform", font=LARGE_FONT)
-        welcome_label.pack(pady=10, padx=10)
-
-        # Picture for paws up
-        paws_up_image = ImageTk.PhotoImage(Image.open("./images/PathsUp.gif"))
-        paws_up_image_label = tk.Label(self, image=paws_up_image)
-        paws_up_image_label.image = paws_up_image
-        paws_up_image_label.pack()
-        
-        # Email Label and entry box
-        email_label = ttk.Label(self, text="Email *", font=SMALL_FONT)
-        email_label.pack(pady=10, padx=10)
-        email_entry = ttk.Entry(self)
-        email_entry.pack()
-
-        # Password label and entry box
-        password_label = ttk.Label(self, text="Password *", font=SMALL_FONT)
-        password_label.pack(pady=10, padx=10)
-        password_entry = ttk.Entry(self, show=password_bullets)
-        password_entry.pack()
-
-        #region Buttons
-
-        # Login
-        log_in_button = ttk.Button(self, text="Log In", command=lambda: check_credentials())
-        log_in_button.pack(pady=10)
-
-        # Signup
-        sign_up_button = ttk.Button(self, text="Sign Up", command=lambda: controller.show_frame(SignUp))
-        sign_up_button.pack()
-
-        # Forgot Password 
-        forgot_password_button = ttk.Button(self, text="Forgot Password", command=lambda: controller.show_frame(ResetPW))
-        forgot_password_button.pack(pady=20, padx=10)
-        # endregion
-
-        # endregion
-
-        # region Methods
-        def check_credentials():
-
-            if hm.check_fields_inputs(
-                    emailEntry=email_entry,
-                    passwordEntry=password_entry,
-                    checkEmailFormat=email_entry.get()):
-
-                controller.show_frame(LogPatient)
-
-        # endregion
-
-
-class SignUp(tk.Frame):
-    first_name = ""
-    middle_Initial = ""
-    last_name = ""
-    email = ""
-    institution = ""
-
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-
-        # region Design
-        welcome_label = ttk.Label(self, text="New Researcher", font=LARGE_FONT)
-        welcome_label.grid(row=0, column=1, pady=10)
-
-        f_name_label = ttk.Label(self, text="First Name *", font=SMALL_FONT)
-        f_name_label.grid(row=2, column=0, padx=0, pady=10)
-        f_name_entry = ttk.Entry(self)
-        f_name_entry.grid(row=2, column=1)
-
-        m_initial_label = ttk.Label(self, text="Middle Initial *", font=SMALL_FONT)
-        m_initial_label.grid(row=4, column=0, padx=10, pady=10)
-        middle_initial_entry = ttk.Entry(self)
-        middle_initial_entry.grid(row=4, column=1)
-
-        l_name_label = ttk.Label(self, text="Last Name *", font=SMALL_FONT)
-        l_name_label.grid(row=8, column=0, padx=10, pady=10)
-        l_name_entry = ttk.Entry(self)
-        l_name_entry.grid(row=8, column=1)
-
-        email_label = ttk.Label(self, text="Email *", font=SMALL_FONT)
-        email_label.grid(row=10, column=0, padx=10, pady=10)
-        email_entry = ttk.Entry(self)
-        email_entry.grid(row=10, column=1)
-
-        inst_label = ttk.Label(self, text="Institution *", font=SMALL_FONT)
-        inst_label.grid(row=12, column=0, padx=10, pady=10)
-        inst_entry = ttk.Entry(self)
-        inst_entry.grid(row=12, column=1)
-
-        password_label = ttk.Label(self, text="Password *", font=SMALL_FONT)
-        password_label.grid(row=14, column=0, pady=10)
-        password_entry = ttk.Entry(self, show="*")
-        password_entry.grid(row=14, column=1, pady=10)
-
-        retype_password_label = ttk.Label(self, text="Retype password *", font=SMALL_FONT)
-        retype_password_label.grid(row=16, column=0, pady=10)
-        retype_password_entry = ttk.Entry(self, show="*")
-        retype_password_entry.grid(row=16, column=1, pady=10)
-
-        sign_up_button = ttk.Button(self, text="Sign Up", command=lambda: signUp())
-        sign_up_button.grid(row=18, column=1, pady=10)
-
-        alreadyHaveAnAccount = ttk.Button(self, text="Already have an Account? Login", command=lambda: controller.show_frame(LoginPage))
-        alreadyHaveAnAccount.grid(row=20, column=1)
-        # endregion
-
-        # region Methods
-        def signUp():
-            # check if fields are empty, if password match and if email is in correct format
-            if hm.check_fields_inputs(
-                    fNameEntry=f_name_entry,
-                    middleInitialEntry=middle_initial_entry,
-                    lNameEntry=l_name_entry,
-                    instEntry=inst_entry,
-                    passwordEntry=password_entry,
-                    reEnterPasswordEntry=retype_password_entry,
-                    emailEntry=email_entry,
-                    checkEmailFormat=email_entry.get(),
-                    ):
-                get_values()
-                print(self.first_name)
-                print(self.middle_Initial)
-                print(self.last_name)
-                print(self.institution)
-
-        def get_values():
-            self.first_name = f_name_entry.get()
-            self.middle_Initial = middle_initial_entry.get()
-            self.last_name = l_name_entry.get()
-            self.email = email_entry.get()
-            self.institution = inst_entry.get()
-
-        # endregion
-
-
-class ResetPW(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-
-        # region Design
-        welcome_label = ttk.Label(self, text="Forgot Your Password?", font=LARGE_FONT)
-        welcome_label.pack(pady=20, padx=10)
-
-        f_name_label = ttk.Label(self, text="Enter registered email", font=SMALL_FONT)
-        f_name_label.pack(pady=10, padx=10)
-        f_name_entry = ttk.Entry(self)
-        f_name_entry.pack()
-
-        send_button = ttk.Button(self, text="Send password reset", command=lambda: controller.show_frame(LoginPage))
-        send_button.pack(pady=30, padx=10)
-
-
-class LogPatient(tk.Frame):
-    # values for all entries
-    age_value = 0
-    weight_value = 0
-    height_value = 0
-    skin_color_type = ""
-    ethnicity_option_selected = ""
-    gender_option_selected = ""
-    duration_value = 0
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-
-        # region Design
-        label = ttk.Label(self, text="Patient's Info", font=LARGE_FONT)
-        label.grid(row=0, column=1, padx=0, pady=10)
-
-        id_label = ttk.Label(self, text="Patient ID:", font=SMALL_FONT)
-        id_label.grid(row=2, column=0, padx=0, pady=10)
-        id_val = ttk.Label(self, text="001", font=SMALL_FONT)      # Interactive get subjID from DB
-        id_val.grid(row=2, column=1)
-
-        age_label = ttk.Label(self, text="Age:", font=SMALL_FONT)
-        age_label.grid(row=4, column=0, padx=10, pady=10)
-        age_entry = ttk.Entry(self)
-        age_entry.grid(row=4, column=1)
-
-        gender_label = ttk.Label(self, text="Sex:", font=SMALL_FONT)
-        gender_label.grid(row=6, column=0, padx=10, pady=10)
-        self.gender_option_selected = tk.StringVar()
-        self.gender_option_selected.set(hm.Gender[0])  # Initial value
-        gender_options = ttk.OptionMenu(self, self.gender_option_selected, *hm.Gender)
-        gender_options.grid(row=6, column=1)
-
-        weight_label = ttk.Label(self, text="Weight:", font=SMALL_FONT)
-        weight_label.grid(row=8, column=0, padx=10, pady=10)
-        weight_entry = ttk.Entry(self)
-        weight_entry.grid(row=8, column=1)
-        weight_label_unit = ttk.Label(self, text="Lb", font=SMALL_FONT)
-        weight_label_unit.grid(row=8, column=2, padx=10, pady=10)
-
-        height_label = ttk.Label(self, text="Height:", font=SMALL_FONT)
-        height_label.grid(row=10, column=0, padx=10, pady=10)
-        height_entry = ttk.Entry(self)
-        height_entry.grid(row=10, column=1)
-
-        ethnicity_label = ttk.Label(self, text="Ethnicity:", font=SMALL_FONT)
-        ethnicity_label.grid(row=12, column=0, padx=10, pady=10)
-        self.ethnicity_option_selected = tk.StringVar()
-        self.ethnicity_option_selected.set(hm.Ethnicity[0])  # Initial value
-        ethnicity_options = ttk.OptionMenu(self, self.ethnicity_option_selected, *hm.Ethnicity)
-        ethnicity_options.grid(row=12, column=1)
-
-
-        skin_color_label = ttk.Label(self, text="Fitzpatrick Scale:", font=SMALL_FONT)
-        skin_color_label.grid(row=16, column=0, padx=10, pady=10)
-        self.skin_color_type = tk.StringVar()
-        self.skin_color_type.set(hm.SkinColor[0])  # Initial value
-        skin_color_entry = ttk.OptionMenu(self, self.skin_color_type, *hm.SkinColor)
-        skin_color_entry.grid(row=16, column=1)
-
-        save_button = ttk.Button(self, text="Save and Continue", command=lambda: save_and_go_to_recording_page())
-        save_button.grid(row=26, column=1, padx=10, pady=30)
-        # endregion
-        
-        # region methods
-        def save_and_go_to_recording_page():
-
-            if get_values():
-                print(self.age_value)
-                print(self.height_value)
-                print(self.weight_value)
-                print(self.ethnicity_option_selected.get())
-                print(self.gender_option_selected.get())
-                print(self.skin_color_type.get())
-                # move to recording page
-                controller.show_frame(DataRecording)
-
-            return
-
-        # get_values stores all values from fields into variables and returns any errors found when trying to
-        # convert each field into its respective type
-        def get_values():
-
-            if hm.check_fields_inputs(
-                    ageEntry=age_entry,
-                    heightEntry=height_entry,
-                    weightEntry=weight_entry,
-                    ethnicityOption=self.ethnicity_option_selected.get(),
-                    genderOption=self.gender_option_selected.get(),
-                    skinColorOption=self.skin_color_type.get()):
-
-                self.age_value = int(age_entry.get())
-                self.height_value = float(height_entry.get())
-                self.weight_value = int(weight_entry.get())
-                return True
-            else:
-                return False
-        # endregion
+    def show_resetPW_frame(self):
+        frame = self.frames["ResetPW"]
+        frame.tkraise()
 
 
 class DataRecording(tk.Frame):
     body_part_option_selected = ""
-    duration_value = 0
+    duration_value = 0.0
+    session_interrupt = -1
 
     # stopwatch
     running = False
-    current_ticking_value = 18000   # This depends on current timezone, may be different in other regions. Starts at 0
-    ticking_value_max = 0   # initialization, actual value assigned on create_stopwatch() function
+    current_ticking_value = 18000  # This depends on current timezone, may be different in other regions. Starts at 0
+    ticking_value_max = 0  # initialization, actual value assigned on create_stopwatch() function
     timer_label = ""
 
-    def __init__(self, parent, controller):
+    AbMode = 0  # start in raw intensity mode
+
+    def __init__(self, parent, controller, ax):
+        global data, x
+        global integration_time, spectra_average
+        global xmin, xmax, ymin, ymax
+        global monitor_wave, monitor_index, monitor
+
+        self.ax = ax
+        self.x = x
+        self.xmin = xmin
+        self.xmax = xmax
+        self.ymin = ymin
+        self.ymax = ymax
+        self.data = data
+        self.line = Line2D(self.x, self.data, color='red')
+        self.ax.add_line(self.line)
+        self.ax.set_ylim(ymin * 0.8, ymax * 1.1)
+        self.ax.set_xlim(self.xmin, self.xmax)
+        monitor_wave = np.median(x)
+
         tk.Frame.__init__(self, parent)
 
-        # region Design
-        label = ttk.Label(self, text="Session Recording", font=LARGE_FONT)
-        label.grid(row=0, column=1, padx=0, pady=10)
+        label = ttk.Label(self, text=f"Session Recording", font=LARGE_FONT)
+        label.pack(side='top', pady=20)
 
-        id_label = ttk.Label(self, text="Patient ID:", font=SMALL_FONT)
-        id_label.grid(row=2, column=0, padx=0, pady=10)
-        id_val = ttk.Label(self, text="001", font=SMALL_FONT)      # Interactive get subjID from DB
-        id_val.grid(row=2, column=1)
+        # This frame1 packs all the labels on the first column on the UI
+        self.frame1 = tk.Frame(self)
+        self.frame1.pack(side='left', anchor=tk.N)
 
-        duration_label = ttk.Label(self, text="Duration:", font=SMALL_FONT)
-        duration_label.grid(row=5, column=0, padx=0, pady=10)
-        duration_entry = ttk.Entry(self)
-        duration_entry.grid(row=5, column=1)
-        seconds_label = ttk.Label(self, text="Seconds", font=SMALL_FONT)
-        seconds_label.grid(row=5, column=2, padx=0, pady=10)
+        # This frame1 packs all the labels on the second column on the UI
+        self.frame2 = tk.Frame(self)
+        self.frame2.pack(side='left', anchor=tk.N)
 
-        body_part_label = ttk.Label(self, text="Body Location:", font=SMALL_FONT)
-        body_part_label.grid(row=4, column=0, padx=0, pady=10)
+        # This frame1 packs all the labels on the third column on the UI
+        self.frame3 = tk.Frame(self)
+        self.frame3.pack(side='left', anchor=tk.N)
+
+        # ID design
+        id_label = tk.Label(self.frame1, text="Patient ID:", font=SMALL_FONT)
+        id_label.pack(side='top', pady=4)
+        id_val = tk.Label(self.frame2, text=LogPatient.patient_id, font=SMALL_FONT)
+        id_val.pack(side='top', pady=4)
+        filler_label = tk.Label(self.frame3, text="")
+        filler_label.pack(side='top')
+
+        # BMI design
+        bmi_label = tk.Label(self.frame1, text="BMI:", font=SMALL_FONT)
+        bmi_label.pack(side='top', pady=4)
+        bmi_val = tk.Label(self.frame2, text="auto", font=SMALL_FONT)
+        bmi_val.pack(side='top', pady=4)
+        filler_label = tk.Label(self.frame3, text="")
+        filler_label.pack(side='top', pady=6)
+
+        # Integration time design
+        duration_label = tk.Label(self.frame1, text="Integration Time", font=SMALL_FONT)
+        duration_label.pack(side='top', pady=4)
+        self.duration_entry = tk.Entry(self.frame2, width='7', justify='right')
+        self.duration_entry.pack(side='top', pady=4, anchor=tk.N)
+        seconds_label = tk.Label(self.frame3, text="Seconds", height='2', font=SMALL_FONT)
+        seconds_label.pack(side='top', pady=4)
+        self.duration_entry.bind('<Return>', self.validate_integration_time)
+
+        # Number of spectra design
+        num_spectra_label = tk.Label(self.frame1, text="Number of Spectra Returned", font=SMALL_FONT)
+        num_spectra_label.pack(side='top', pady=4)
+        num_spectra_entry = tk.Entry(self.frame2, width='7', justify='right')
+        num_spectra_entry.pack(side='top', pady=10)
+
+        # Amount of spectra to average design
+        spec_avg_label = tk.Label(self.frame1, text='Amount of Spectra to Average ', width='20', wraplength='150',
+                                  font=SMALL_FONT)
+        spec_avg_label.pack(side='top', pady=4)
+        self.spec_avg_entry = tk.Entry(self.frame2, width='7', justify='right')
+        self.spec_avg_entry.pack(side='top', pady=20)
+        self.spec_avg_entry.bind('<Return>', self.validate_spec_avg)
+
+        # Minimum wavelength label and entry field
+        xmin_label = tk.Label(self.frame1, text='Minimum wavelength', font=SMALL_FONT)
+        xmin_label.pack(side='top', pady=2)
+        self.xmin_entry = tk.Entry(self.frame2, width='7', justify='right')
+        self.xmin_entry.pack(side='top', pady=15)
+        self.xmin_entry.insert(0, xmin)  # AUTO INPUTS VALUE
+        self.xmin_entry.bind('<Return>', self.validate_xmin)
+
+        # Maximum wavelength label and entry field
+        xmax_label = tk.Label(self.frame1, text='Maximum wavelength', height='2', font=SMALL_FONT)
+        xmax_label.pack(side='top', pady=2)
+        self.entryxmax = tk.Entry(self.frame2, width='7', justify='right')
+        self.entryxmax.pack(side='top', pady=5)
+        self.entryxmax.insert(0, xmax)  # AUTO INPUTS VALUE
+        self.entryxmax.bind('<Return>', self.validate_xmax)
+
+        body_part_label = tk.Label(self.frame1, text="Body Location:", height='2', font=SMALL_FONT)
+        body_part_label.pack(side='top', pady=4)
         self.body_part_option_selected = tk.StringVar()
         self.body_part_option_selected.set(hm.BodyParts[0])  # Initial Value
-        body_part_options = ttk.OptionMenu(self, self.body_part_option_selected, *hm.BodyParts)
-        body_part_options.grid(row=4, column=1, padx=0, pady=10)
+        body_part_options = ttk.OptionMenu(self.frame2, self.body_part_option_selected, *hm.BodyParts)
+        body_part_options.pack(side='top', pady=15)
 
-        btn_start_stop = ttk.Button(self, text="Start", command=lambda: start_stop_process())
-        btn_start_stop.grid(row=8, column=0, padx=0, pady=10)
+        btn_start_stop = ttk.Button(self.frame1, text="Start", command=lambda: start_stop_process())
+        btn_start_stop.pack(side='top', pady=10)
 
-        btn_save = ttk.Button(self, text="Save", command=lambda: save_recording())
-        btn_save.grid(row=14, column=0, padx=0, pady=10)
+        btn_save = ttk.Button(self.frame2, text="Save", command=lambda: save_recording())
+        btn_save.pack(side='top', pady=10)
 
-        btn_pause_resume = ttk.Button(self, text="Pause", command=lambda: pause_resume_process())
-        btn_pause_resume.grid(row=8, column=1, padx=0, pady=10)
+        btn_pause_resume = ttk.Button(self.frame1, text="Pause", command=lambda: pause_resume_process())
+        btn_pause_resume.pack(side='top', pady=10)
 
+        diff_patient_button = ttk.Button(self.frame2, text="Next Patient",
+                                         command=lambda: controller.show_patientLog_frame())
+        diff_patient_button.pack(side='top', pady=10)
 
-        diff_patient_button = ttk.Button(self, text="Next Patient", command=lambda: controller.show_frame(LogPatient))
-        diff_patient_button.grid(row=14, column=1, padx=0, pady=10)
+        quit_button = tk.Button(self.frame1, text="Quit")
+        quit_button.pack(side='bottom', pady=10)
+        quit_button.bind('<ButtonRelease-1>', self.quit_app)
 
-        log_out_button = ttk.Button(self, text="Log out", command=lambda: controller.show_frame(LoginPage))
-        log_out_button.grid(row=14, column=2, padx=0, pady=10)
+        button_reset_y = tk.Button(self.frame1, text='Reset Y axis scale')
+        button_reset_y.pack(side='bottom', pady=10)
+        button_reset_y.bind('<ButtonRelease-1>', self.reset_y)
 
-        checkbox_value = tk.IntVar()
-        check_box_label = tk.Checkbutton(self, text="Interrupted session", variable=checkbox_value)
+        log_out_button = tk.Button(self.frame1, text="Log out", command=lambda: controller.show_login_frame())
+        log_out_button.pack(side='bottom', pady=10)
 
-        check_box_label.grid(row=15, padx=0, pady=10)
-        # endregion
+        check_box_label = tk.Checkbutton(self.frame1, text="Interrupted session", command=lambda: box_toggled())
+        check_box_label.pack(side='bottom', pady=10)
 
+        # Disable pause while the clock is not started
         hm.disable_fields(btn_pause_resume)
 
-        def save_recording():
-            if checkbox_value.get() == 1:    # If interrupted session
+        # Labels for the graph
+        ax.set_xlabel('Wavelength (nm)')
+        ax.set_ylabel('Counts')
 
+        # Creates the design for the graph
+        canvas = FigureCanvasTkAgg(fig, self)
+        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+
+        monitor_index = np.searchsorted(x, monitor_wave, side='left')
+        monitor = np.round(self.data[monitor_index], decimals=3)
+        self.text = self.ax.text(0.9, 0.9, monitor, transform=ax.transAxes, fontsize=14)
+        #self.ax.axvline(x=monitor_wave, lw=2, color='blue', alpha=0.5)                 # Blue line in on the graph
+
+        # This method changes a value when checkBox is checked meaning a session was interrupted
+        def box_toggled():
+            self.session_interrupt *= -1
+
+        def save_csv_to_cloud(file_path):
+            """ Upload csv file to Azure """
+            blob = BlobClient.from_connection_string(conn_str="Connection String Place Holder",
+                                                     container_name="Container Name Place Holder",
+                                                     blob_name=file_path)
+            with open(file_path, "rb") as up:
+                blob.upload_blob(up)
+
+        def save_recording():
+            if self.session_interrupt == -1:
+                print("Normal session")
+                file_name = str(LogPatient.patient_id) + "_" + str(self.body_part_option_selected.get()) + ".csv"
+                print(file_name)
+                save_csv_to_cloud(file_name)
+            else:
                 # TODO: Message box will probably have to be a customized pop-up. You can't add an entry text field here
                 result = tk.messagebox.askyesno("Interrupted session", "You have marked this session as interrupted.\n"
                                                                        "Data will be saved in different database")
-                if result:     # If user confirmed session was interrupted and he/she agrees with message
+                if result:  # If user confirmed session was interrupted and he/she agrees with message
                     # TODO: Data in different database
                     print("Result:")
                     print(result)
-
-            else:   # normal session
-                print(self.duration_value)
 
             return
 
@@ -403,9 +284,9 @@ class DataRecording(tk.Frame):
 
             btn_pause_resume["text"] = "Pause"
             start_stopwatch(self.timer_label)
-            hm.disable_fields(body_part_options, duration_entry)
+            hm.disable_fields(body_part_options, self.duration_entry)
 
-            #TODO
+            # TODO
             # Connect to save again values with different body part in DB
             print(self.duration_value)
             print(self.body_part_option_selected.get())
@@ -413,16 +294,16 @@ class DataRecording(tk.Frame):
             return
 
         def pause_process():
-            #TODO
+            # TODO
             # Do we want to change the duration and body part once user pauses? *** BUG ***
             btn_pause_resume["text"] = "Resume"
             self.running = False
-            hm.enable_fields(body_part_options, duration_entry)
+            hm.enable_fields(body_part_options, self.duration_entry)
             return
 
         def start_stop_process():
 
-            if check_fields():    # no errors
+            if check_fields():  # no errors
                 if hm.is_start_button(btn_start_stop):
                     start_process()
                 else:
@@ -430,10 +311,9 @@ class DataRecording(tk.Frame):
 
             return
 
-
         def start_process():
 
-            hm.disable_fields(btn_save, log_out_button, diff_patient_button, body_part_options, duration_entry)
+            hm.disable_fields(btn_save, log_out_button, diff_patient_button, body_part_options, self.duration_entry)
             hm.enable_fields(btn_pause_resume)
             btn_start_stop["text"] = "Stop"
 
@@ -447,7 +327,7 @@ class DataRecording(tk.Frame):
             btn_pause_resume["text"] = "Pause"  # if stop the recording, we need to reset this button (bug)
             btn_start_stop["text"] = "Start"
 
-            hm.enable_fields(btn_save, log_out_button, diff_patient_button, body_part_options, duration_entry)
+            hm.enable_fields(btn_save, log_out_button, diff_patient_button, body_part_options, self.duration_entry)
 
             self.running = False
             self.timer_label.destroy()
@@ -456,9 +336,10 @@ class DataRecording(tk.Frame):
         # checks for any errors, prints them and returns False, otherwise no errors and returns True
         def check_fields():
 
-            if hm.check_fields_inputs(durationEntry=duration_entry, bodyPartOption=self.body_part_option_selected.get()):
+            if hm.check_fields_inputs(durationEntry=self.duration_entry,
+                                      bodyPartOption=self.body_part_option_selected.get()):
 
-                self.duration_value = int(duration_entry.get())
+                self.duration_value = float(self.duration_entry.get())
                 return True
 
             else:
@@ -466,8 +347,8 @@ class DataRecording(tk.Frame):
 
         # region Stopwatch
         def create_stopwatch():
-            self.timer_label = tk.Label(self, text="Welcome!", fg="black", font="Verdana 15 bold")
-            self.timer_label.grid(row=10, column=1, padx=10, pady=10)
+            self.timer_label = tk.Label(self.frame1, text="Stopwatch!", fg="black", font="Verdana 15 bold")
+            self.timer_label.pack(pady=10)
             self.current_ticking_value = 18000  # we need to reset the timer after 1st recording
 
             # Cannot assign ticking_value_max until we know the duration_value and after being checked
@@ -481,8 +362,8 @@ class DataRecording(tk.Frame):
 
         def counter_label(timer_label):
             def count():
-                if self.running and self.current_ticking_value <= self.ticking_value_max:     # if from 0 to limit
-                    # To manage the intial delay.
+                if self.running and self.current_ticking_value <= self.ticking_value_max:  # if from 0 to limit
+                    # To manage the initial delay.
                     if self.current_ticking_value == 18000:
                         display = "Starting..."
                     else:
@@ -495,17 +376,135 @@ class DataRecording(tk.Frame):
                     timer_label.after(1000, count)
                     self.current_ticking_value += 1
 
-                elif not self.running and self.current_ticking_value <= self.ticking_value_max:   # if paused
+                elif not self.running and self.current_ticking_value <= self.ticking_value_max:  # if paused
                     timer_label['text'] = "Paused..."
 
                 else:
                     timer_label['text'] = "Finished!"
                     hm.disable_fields(btn_pause_resume)
                     btn_pause_resume["text"] = "Pause"
+
             # Triggering the start of the counter.
             count()
-        # endregion
+
+    def quit_app(root, event):
+        """ Quits the program """
+        root.destroy()
+        exit()
+
+    def reset_y(self, event):
+        data = spec.intensities(correct_nonlinearity=False)
+        ymin = min(data)
+        ymax = max(data)
+        ax.set_ylim(ymin * 0.9, ymax * 1.1)
+
+    def set_entry_config(self):
+        """ This function handles new inputs on the text fields and it send values to spectrometer """
+        global integration_time  # , spectra_average
+        spec.integration_time_micros(integration_time)
+        # spec.scans_to_average(spectra_average)
+        # write new configuration to dialog
+        self.duration_entry.delete(0, "end")
+        self.duration_entry.insert(0, integration_time / 1000)  # write ms, but integration_time is microseconds
+
+    def validate_integration_time(self, event):
+        """ Update integration time and validates from 4ms to 65000 """
+        global integration_time
+        # typically OO spectrometers cant read faster than 4 ms
+        int_time_temp = self.duration_entry.get()
+
+        if int_time_temp.isdigit():
+            if int(int_time_temp) > 65000:
+                msg = "The integration time must be 65000 ms or smaller.  You set " + int_time_temp
+                self.set_entry_config()
+            elif int(int_time_temp) < 4:
+                msg = "The integration time must be greater than 4 ms.  You set " + int_time_temp
+                self.set_entry_config()
+            else:
+                integration_time = int(int_time_temp) * 1000  # convert ms to microseconds
+                self.set_entry_config()
+        else:
+            msg = "Integration time must be an integer between 4 and 65000 ms.  You set " + str(int_time_temp)
+            self.set_entry_config()
+
+    def validate_spec_avg(self, event):
+        # averaging needs to be implemented here in code
+        global spectra_average
+        spectra_average = self.spec_avg_entry.get()
+        if spectra_average.isdigit():
+            spec.scans_to_average(int(spectra_average))
+
+        else:
+            msg = "spectra_average must be an integer.  You tried " + str(spectra_average) + ".  Setting value to 1."
+            spectra_average = 1
+            self.spec_avg_entry.delete(0, "end")
+            self.spec_avg_entry.insert(0, spectra_average)
+
+    def validate_xmax(self, event):
+        """ Validates max wavelength to show in graph """
+        global xmax
+        xmax_temp = self.entryxmax.get()
+
+        try:
+            float(xmax_temp)
+            xmax_temp = float(self.entryxmax.get())
+            if xmax_temp > xmin:
+                xmax = xmax_temp
+                self.entryxmax.delete(0, 'end')
+                self.entryxmax.insert(0, xmax)  # set text in box
+                self.ax.set_xlim(xmin, xmax)
+            else:
+                msg = "Maximum wavelength must be larger than minimum wavelength.  You entered " + str(
+                    xmax_temp) + " nm."
+                self.entryxmax.delete(0, 'end')
+                self.entryxmax.insert(0, xmax)  # set text in box
+        except:
+            self.entryxmax.delete(0, 'end')
+            self.entryxmax.insert(0, xmax)  # set text in box to unchanged value
+
+    def validate_xmin(self, event):
+        """ Validates min wavelength to show in graph """
+        global xmin
+        xmin_temp = self.xmin_entry.get()
+
+        try:
+            float(xmin_temp)
+            xmin_temp = float(self.xmin_entry.get())
+            if xmin_temp < xmax:
+                xmin = xmin_temp
+                self.xmin_entry.delete(0, 'end')
+                self.xmin_entry.insert(0, xmin)  # set text in box
+                self.ax.set_xlim(xmin, xmax)
+            else:
+                msg = "Minimum wavelength must be smaller than maximum wavelength.  You entered " + str(
+                    xmin_temp) + " nm."
+                self.xmin_entry.delete(0, 'end')
+                self.xmin_entry.insert(0, xmin)  # set text in box
+        except:
+            self.xmin_entry.delete(0, 'end')
+            self.xmin_entry.insert(0, xmin)  # set text in box to unchanged value
+
+    def update(self, data):
+        """ This function manages the update of the
+        spectral data in the graph. It issues a read request to the spectrometer,
+        then conditionally processes the received data """
+        file_name = str(LogPatient.patient_id) + "_" + str(self.body_part_option_selected.get()) + ".csv"
+        not2save = str(LogPatient.patient_id) + "_Select an option.csv"
+        if file_name != not2save:
+            with open(file_name, "w", newline='') as towrite:
+                lineWriter = csv.writer(towrite, quotechar='|', delimiter='\n', quoting=csv.QUOTE_NONE)
+                lineWriter.writerow(self.data)
+
+        self.data = spec.intensities()
+        self.data = np.array(self.data, dtype=float)
+        self.line.set_data(self.x, self.data)
+        monitor = np.round(self.data[monitor_index], decimals=3)
+        self.text.set_text(monitor)
+        return self.line,
+    # endregion
 
 
-app = Controller()
+fig, ax = plt.subplots()
+app = Controller(ax)
+ani = animation.FuncAnimation(fig, app.frames["DataRecording"].update, interval=10, blit=False)
 app.mainloop()

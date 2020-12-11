@@ -6,38 +6,26 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
-
 
 
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
   <a href="https://github.com/apast005/QMS">
-    <img src="https://avatars3.githubusercontent.com/u/69246622?s=460&u=db1d7a32b0de4373c355352638a3e7cad9ffa97c&v=4" alt="Logo" width="80" height="80">
+    <img src="Data-recording-UI/images/PathsUp.gif" alt="Logo" width="150" height="120">
   </a>
 
-  <h3 align="center">FIUCIS-CDA UNIX Student Project</h3>
+  <h3 align="center">Enabling Wearable Technology on Patients with High Body Mass Index</h3>
 
   <p align="center">
-    UNIX project to automate Quartus and ModelSim operations through shell scripting
+    The project aims to provide researchers with a User Interface to control a medical device in development, which keeps measurements of blood pressure and diabetes through the analysis of wavelength and light absorption using a spectrometer. Additionally, the project includes the use of Cloud Computing for Data Analytics from the gathered device data.
     <br />
-    <a href="https://github.com/apast005/QMS"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/CPRGB/Senior_Design_2020.git"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/apast005/QMS">View Demo</a>
-    ·
-    <a href="https://github.com/apast005/QMS/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/apast005/QMS/issues">Request Feature</a>
+    <a href="https://www.youtube.com/watch?v=jcINGjAzjmo">View Demo</a>
   </p>
 </p>
-
 
 
 <!-- TABLE OF CONTENTS -->
@@ -61,27 +49,14 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+The end goal of this project is to create wearable devices that monitor blood preasure levels and heart rate for overweight population. A user interface (UI) is being developed with different functionalities to facilitate researchers work when logging in patient's information and perform data recorderings. This UI will be running on a Raspberry Pi computer and will allow researchers to start recording sessions and save the gathered data to a database. The data recorded will be processed by an algorithm and displayed on a website accesible by multiple researchers around the world.
 
-UNIX course project to automate the installation of Intel's Quartus and ModelSim
-for Linux Ubuntu 20.04. Necessary library dependencies for installation are checked
-and installed.  Hardware components downloaded from [FIUSCIS-CDA GitHub](https://github.com/FIUSCIS-CDA?tab=repositories)
-will also download the dependencies for the hardware to operate.  Documentation
-will also be converted to man pages to be more readily accessed by the community.
-
-Any feedback/suggestions to make this project a useful contribution to the open
-source community is greatly appreciated!
-My main goal is to ease the use of Quartus and ModelSim for educational purposes
-and create polished shell scripts for anyone to use.
-
-
-Most of the README will be updated as the project progresses.  The majority is
-still in a template format derived from [this github.](https://github.com/othneildrew/Best-README-Template/blob/master/BLANK_README.md)
 ### Built With
 
-* []()
-* []()
-* []()
+* [Python3]()
+* [Matplotlib]()
+* [Microsoft Azure]()
+* [Rapberry Pi]()
 
 
 
@@ -92,21 +67,19 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-TODO: Adding prerequisites here at a later date.  Below is a template
-* npm
+This code was run and tested on a Raspberry Pi 3b+ that was connected to a STS spectrometer from Ocean Optics. This two components are essential to make this code functional. However, [THIS](https://github.com/jonathanvanschenck/python-seatease) emulator can be used to run and test the code from any computer in the absence of a Raspberry Pi and/or spectrometer.  
+* Python-seabreeze
 ```sh
-npm install npm@latest -g
+pip3 install seabreeze
+seabreeze_os_setup
 ```
+For more information about this library [click here](https://github.com/ap--/python-seabreeze)
 
 ### Installation
 
 1. Clone the repo
 ```sh
-git clone https://github.com/apast005/QMS.git
-```
-2. Install NPM packages
-```sh
-npm install
+git clone https://github.com/CPRGB/Senior_Design_2020.git
 ```
 
 
@@ -114,45 +87,32 @@ npm install
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+The graphical user interface makes pretty easy the interaction.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+* The "Log in" page authenticates the researcher that will start the data recording on the patient. This screen also allows a new researcher to create an account and recover password in case they forget.
+<p align="center">
+    <img src="Data-recording-UI/images/LogIn.png" alt="Logo" width="620" height="450">
+<p align="center">
 
+* The "Sign up" page is just to create a new user(researcher) and it asks for some basic information.
+<p align="center">
+    <img src="Data-recording-UI/images/SignUp.png" alt="Logo" width="620" height="450">
+<p align="center">
 
+* The "ResetPassword" page (functionality needs to be implemented) allows to recover password if forgotten, after it authenticates that user's email exists in the database. The plan is to send a unique link for them to reset the password.
+<p align="center">
+    <img src="Data-recording-UI/images/ResetPW.jpeg" alt="Logo" width="620" height="450">
+<p align="center">
 
-<!-- ROADMAP -->
-## Roadmap
-1. Increase Usability      
-    - [X] Download the appropriate components from GitHub and produce useful messages and/or log files for users as appropriate.  
-    - [ ] Outputs of these test benches also should be displayed in the terminal or into log files in ways that make sense
-    - [ ] A user should be able to turn interactive mode on or off (for
-              * Example:  Windows users executing these test benches over Putty
+* The "LogPatient" page allows to gather biographical and physical information of the patient. Right before to continue to the next page patient's bmi is calculated and all this information is uploaded to database hosted in Azure.
+<p align="center">
+    <img src="Data-recording-UI/images/LogPatient.png" alt="Logo" width="620" height="450">
+<p align="center">
 
-2. Automate component integration/testing
-    - [X] Automate this process through scripts that could process these dependency files and check if dependencies have been installed
-    - [ ] Test benches for components should be automatically executed upon installation to validate a working component.
-
-3. Documentation is in PDF table that specifies the module name, dependencies, inputs, outputs, and an English description of the component.  
-    - [ ] Alternative environment for documentation like Unix “man” pages.
-
-4. See the [open issues](https://github.com/apast005/QMS/issues) for a list of proposed features (and known issues).
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-This is my first time trying Shell Scripting to automate a task.  Any feedback/suggestions is greatly appreciated and I thank you for taking the time
-to help me grow and provide a contribution to the open source community.
-
-Below is a template from a README template I used that is listed in Acknowledgments
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+* The "DataRecording" page is where all the spectra is gather from different parts of the body. This page allows researcher to set integration time as well as amount of spectra to average. The information gathered will be saved as raw data into .csv files and uploaded to Azure storage account referencing the database by having as name "Patient_ID" underscore "Body_Location" .csv for example "123_Arm.csv"
+<p align="center">
+    <img src="Data-recording-UI/images/DataRecord.png" alt="Logo" width="620" height="450">
+<p align="center">
 
 
 
@@ -166,46 +126,14 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Alex Pastoriza - apast005@fiu.edu
-
-Project Link: [https://github.com/apast005/QMS](https://github.com/apast005/QMS)
-
-
-
-<!-- REFERENCES -->
-## References
-
-* [Intel Installation Guide](https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/manual/quartus_install.pdf#page=12&zoom=auto,-207,693)
-* [Intel Quick Start Guide](https://fpgasoftware.intel.com/static/quick_start_guide/quick_start_guide_20.1_en.pdf)
-* [Quartus Manual](https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/manual/quartus_install.pdf)
-* [Intel Installation FAQS](https://www.intel.com/content/www/us/en/programmable/downloads/software/faq/installation-faq.html?erpm_id=8905536_ts1601556901225#_Toc361418227)
-* [Intel's Download Center](https://fpgasoftware.intel.com/20.1/?edition=lite)
-* []()
+Alex Pastoriza - <apast005@fiu.edu> <br>
+Gustavo Cordido - <gcord018@fiu.edu> <br>
+Jose Bello - <jbell139@fiu.edu> <br>
+Idiel Guerra - <iguer034@fiu.edu> <br>
+Robert Rodriguez - <rrodr630@fiu.edu> 
 
 
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 * [Template for README](https://github.com/othneildrew/Best-README-Template/blob/master/BLANK_README.md)
-* []()
-* []()
-
-
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/apast005/QMS.svg?style=flat-square
-[contributors-url]: https://github.com/apast005/QMS/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/apast005/QMS.svg?style=flat-square
-[forks-url]: https://github.com/apast005/QMS/network/members
-[stars-shield]: https://img.shields.io/github/stars/apast005/QMS.svg?style=flat-square
-[stars-url]: https://github.com/apast005/QMS/stargazers
-[issues-shield]: https://img.shields.io/github/issues/apast005/QMS.svg?style=flat-square
-[issues-url]: https://github.com/apast005/QMS/issues
-[license-shield]: https://img.shields.io/github/license/apast005/QMS.svg?style=flat-square
-[license-url]: https://github.com/apast005/QMS/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-blue.svg?style=flat-square&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/alexander-pastoriza
-[product-screenshot]: images/screenshot.png
